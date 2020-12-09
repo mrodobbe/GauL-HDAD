@@ -24,9 +24,9 @@ def gaussian_mixture_model(geometry_type, values):
     GMM of one type
     """
     # peak_file = open("Dataset/Cyclic/list_peaks_qm9.txt", 'r')
-    # peak_file = open("Dataset/Cyclic/list_peaks_EM_new_O.txt", 'r')
+    peak_file = open("list_peaks.txt", 'r')
     # peak_file = open("Dataset/Cyclic/list_peaks_mit.txt", 'r')
-    peak_file = open("Dataset/Cyclic/list_peaks_EM_kaust.txt", 'r')
+    # peak_file = open("Dataset/Cyclic/list_peaks_EM_kaust.txt", 'r')
     for line in peak_file:
         line_split = line[:-1].split('\t')
         if geometry_type.__eq__(line_split[0]):
