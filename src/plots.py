@@ -20,6 +20,9 @@ def performance_plot(outputs, predictions, test, prop, folder="newPredictions", 
         metric = "J mol$^{-1}$ K$^{-1}$"
     else:
         metric = "-"
+    if prop == "cp":
+        outputs = outputs[:, 0]
+        predictions = predictions[:, 0]
     hfont = {'fontname': 'UGent Panno Text'}
     font = FontProperties(family='UGent Panno Text',
                           weight='normal',
