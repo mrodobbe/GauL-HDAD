@@ -151,4 +151,7 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_v
                 f.write(str(m) + '\t' + str(round(v, 4)) + '\t' + str(round(p, 4)) + '\t' + str(round(e, 4)) + '\n')
             f.close()
 
-    return test_mean_absolute_error, test_root_mean_squared_error, svr_mean_absolute_error, svr_root_mean_squared_error
+        return test_mean_absolute_error, test_root_mean_squared_error, \
+               svr_mean_absolute_error, svr_root_mean_squared_error
+    else:
+        return test_mean_absolute_error, test_root_mean_squared_error
