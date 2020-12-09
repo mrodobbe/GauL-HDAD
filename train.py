@@ -22,6 +22,15 @@ except PermissionError:
           "1) Open Anaconda as Administrator\n"
           "2) Manually create the subfolder Output with 2 additional subfolders in Output: gmm and hist")
     raise
+except FileExistsError:
+    print("Folder already exists.")
+
+try:
+    os.mkdir(str(save_folder + "/gmm"))
+    os.mkdir(str(save_folder + "/hist"))
+except FileExistsError:
+    print("Folders already exist.")
+
 try:
     molecule_file = sys.argv[1]
     target_property = str(sys.argv[2])
