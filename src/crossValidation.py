@@ -63,12 +63,12 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_v
                         validation_data=(x_val, y_val),
                         batch_size=8, callbacks=[es, lh], verbose=0)
     model.save(str(save_folder + "/Fold {}".format(i)))
-    if target is not "cp":
+    if target != "cp":
         validation_predictions = model.predict(x_val).reshape(-1)
     else:
         validation_predictions = np.asarray(model.predict(x_val)).astype(np.float)
 
-    if target is not "h":
+    if target != "h":
         validation_predictions = denormalize(validation_predictions, heavy_val, target, coefficient=1.5)
         y_val = denormalize(y_val, heavy_val, target, coefficient=1.5)
 
@@ -80,12 +80,12 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_v
     print('Mean absolute error:\t\t{:.2f} kJ/mol'.format(validation_mean_absolute_error))
     print('Root mean squared error:\t{:.2f} kJ/mol'.format(validation_root_mean_squared_error))
 
-    if target is not "cp":
+    if target != "cp":
         test_predictions = model.predict(x_test).reshape(-1)
     else:
         test_predictions = np.asarray(model.predict(x_test)).astype(np.float)
 
-    if target is not "h":
+    if target != "h":
         test_predictions = denormalize(test_predictions, heavy_test, target, coefficient=1.5)
         y_test = denormalize(y_test, heavy_test, target, coefficient=1.5)
 
@@ -97,7 +97,7 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_v
     print('Mean absolute error:\t\t{:.2f} kJ/mol'.format(test_mean_absolute_error))
     print('Root mean squared error:\t{:.2f} kJ/mol'.format(test_root_mean_squared_error))
 
-    if target is not "cp":
+    if target != "cp":
         intermediate_layer = Model(inputs=model.input, outputs=model.get_layer('layer_3').output)
         training_intermediates = np.asarray(intermediate_layer(x_train_all)).astype(np.float)
         test_intermediates = np.asarray(intermediate_layer(x_test)).astype(np.float)
@@ -119,7 +119,7 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_v
         f.write('ANN Test performance statistics:\n')
         f.write('Mean absolute error:\t\t{:.2f} kJ/mol\n'.format(validation_mean_absolute_error))
         f.write('Root mean squared error:\t{:.2f} kJ/mol\n\n'.format(validation_root_mean_squared_error))
-        if target is not "cp":
+        if target != "cp":
             f.write('SVR Test performance statistics:\n')
             f.write('Mean absolute error:\t\t{:.2f} kJ/mol\n'.format(svr_mean_absolute_error))
             f.write('Root mean squared error:\t{:.2f} kJ/mol\n'.format(svr_root_mean_squared_error))
@@ -141,7 +141,7 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_v
 
     performance_plot(y_test, test_predictions, "test", prop=target, folder=str(save_folder + "/Fold {}".format(i)),
                      model="ANN", fold=i)
-    if target is not "cp":
+    if target != "cp":
         performance_plot(y_test, y_svr, "test", prop=target, folder=str(save_folder + "/Fold {}".format(i)),
                          model="SVR", fold=i)
 

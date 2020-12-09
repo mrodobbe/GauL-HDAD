@@ -97,8 +97,7 @@ def gmm_plot(histogram_values, gmm_values, title=None, c_curve='#0f4c81', c_peak
 
 
 def output_plot(file, values=None, name="output_plot", cp_column=0, folder="newPredictions"):
-    molecules, outputs = molecule_list(file, suppress="yes")
-    outputs = np.asarray(outputs).astype(np.float)
+    molecules, outputs, bad_molecules = molecule_list(file, suppress="yes")
     if values is not None:
         outputs = np.asarray(values)
     if len(outputs.shape) > 1 or "cp" in name:

@@ -7,7 +7,7 @@ from src.crossValidation import run_cv
 from src.gaussian import gmm
 import time
 import os
-from src.plots import histogram_plots, gmm_plot
+from src.plots import histogram_plots, gmm_plot, output_plot
 from sklearn.model_selection import KFold
 from joblib import Parallel, delayed, cpu_count
 
@@ -28,8 +28,10 @@ except FileNotFoundError:
     raise
 
 # TODO: Add argument for user-defined output folder
-save_folder = "/Output"
+save_folder = "./Output"
 os.mkdir(save_folder)
+if property != "cp":
+    output_plot(molecule_file, folder=save_folder)
 if len(bad_molecules) > 0:
     np.savetxt("/Output/bad_molecules.txt", bad_molecules, fmt="%s")
     print("Dumped a list with molecules which could not be parsed in Output/bad_molecules.txt")
@@ -77,7 +79,7 @@ with open(str(save_folder + "/representations.pickle"), "wb") as f:
     pickle.dump(representations, f)
 print("Dumped the molecule representations!")
 
-if target_property is not "h":
+if target_property != "h":
     outputs, heavy_atoms = normalize(molecules, outputs, "s", coefficient=1.5)
 else:
     heavy_atoms = np.asarray([heavy_atoms(mol) for mol in molecules])
@@ -106,12 +108,12 @@ cv_info = Parallel(n_jobs=n_jobs)(delayed(run_cv)(molecules, heavy_atoms, repres
 for j in range(n_folds):
     prediction_mae.append(cv_info[j][0])
     prediction_rmse.append(cv_info[j][1])
-    if target_property is not "cp":
+    if target_property != "cp":
         prediction_svr_mae.append(cv_info[j][2])
         prediction_svr_rmse.append(cv_info[j][3])
 
 best_index = np.argmin(prediction_rmse)
-if target_property is not "cp":
+if target_property != "cp":
     best_index_svr = np.argmin(prediction_svr_rmse)
     with open(str(save_folder + "/best_models.txt"), "w") as f:
         f.write("The best ANN model is from fold {}, "
@@ -132,7 +134,7 @@ with open(str(save_folder + "/test_statistics.txt"), "w") as f:
                                                                         np.std(prediction_rmse)))
     for i, mae_value, rmse_value in zip(range(len(prediction_mae)), prediction_mae, prediction_rmse):
         f.write('Fold {} - MAE: {} kJ/mol\t\t-\t\tRMSE: {} kJ/mol\n'.format(i+1, mae_value, rmse_value))
-    if target_property is not "cp":
+    if target_property != "cp":
         f.write('\nTest performance statistics for SVR:\n')
         f.write('Mean absolute error:\t\t{:.2f} +/- {} kJ/mol\n'.format(np.mean(prediction_svr_mae),
                                                                         np.std(prediction_svr_mae)))
