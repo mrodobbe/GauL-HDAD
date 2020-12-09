@@ -77,6 +77,9 @@ def molecule_list(molecule_file, suppress="no"):
             else:
                 outputs.append(line[1])
 
+    bad_molecules = np.asarray(bad_molecules)
+    outputs = np.asarray(outputs).astype(np.float)
+
     # Suppresses the printed output about the file length
 
     if suppress == "no":
