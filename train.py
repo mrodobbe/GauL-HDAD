@@ -13,6 +13,15 @@ from joblib import Parallel, delayed, cpu_count
 
 start = time.time()
 
+# TODO: Add argument for user-defined output folder
+save_folder = "./Output"
+try:
+    os.mkdir(save_folder)
+except PermissionError:
+    print("No permission to create folder.\nThere are two ways to solve the problem:\n"
+          "1) Open Anaconda as Administrator\n"
+          "2) Manually create the subfolder Output with 2 additional subfolders in Output: gmm and hist")
+    raise
 try:
     molecule_file = sys.argv[1]
     target_property = str(sys.argv[2])
@@ -27,9 +36,6 @@ except FileNotFoundError:
     print("The input file does not exist.")
     raise
 
-# TODO: Add argument for user-defined output folder
-save_folder = "./Output"
-os.mkdir(save_folder)
 if property != "cp":
     output_plot(molecule_file, folder=save_folder)
 if len(bad_molecules) > 0:
