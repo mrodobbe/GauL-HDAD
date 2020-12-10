@@ -96,10 +96,7 @@ def gmm_plot(histogram_values, gmm_values, title=None, c_curve='#0f4c81', c_peak
             plt.show()
 
 
-def output_plot(file, values=None, name="output_plot", cp_column=0, folder="newPredictions"):
-    molecules, outputs, bad_molecules = molecule_list(file, suppress="yes")
-    if values is not None:
-        outputs = np.asarray(values)
+def output_plot(molecules, outputs, name="output_plot", cp_column=0, folder="newPredictions"):
     if len(outputs.shape) > 1 or "cp" in name:
         y_label = 'CBS-QB3 Heat Capacity [J mol$^{-1}$ K$^{-1}$]'
         if len(outputs.shape) > 1:
