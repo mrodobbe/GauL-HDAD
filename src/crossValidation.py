@@ -13,8 +13,7 @@ from joblib import wrap_non_picklable_objects
 def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_val_split=0.9):
     train = loop[0]
     test = loop[1]
-    print(train)
-    print(test)
+    all_molecules = np.asarray(all_molecules)
     training_molecules = all_molecules[train]
     test_molecules = all_molecules[test]
 
