@@ -60,7 +60,7 @@ def molecule_list(molecule_file, suppress="no"):
 
         # TODO: Instead of removing the molecule, a method must be created to figure out the coordinates of the molecule
 
-        print(line[0])
+        # print(line[0])
         molecules.append(line[0])
 
         # Read the outputs. Different outputs are distinguished:
