@@ -3,7 +3,6 @@ from src.plots import store_histograms, store_gaussians
 import math
 import numpy as np
 from joblib import Parallel, cpu_count, delayed
-import pickle
 
 
 def run_gmm(key, geometry_dict):
