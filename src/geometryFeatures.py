@@ -175,43 +175,41 @@ def cc(bond, bond_length):
     if bond == "CC":
         if bond_length < 1.25:
             bond = "C1"
-        elif bond_length < 1.36:
+        elif bond_length < 1.31:
             bond = "C2"
-        elif bond_length < 1.39:
+        elif bond_length < 1.36:
             bond = "C3"
-        elif bond_length < 1.44:
+        elif bond_length < 1.425:
             bond = "C4"
-        elif bond_length < 1.46:
-            bond = "CV"
-        elif bond_length < 1.47:
+        elif bond_length < 1.468:
             bond = "C5"
         elif bond_length < 1.8:
             bond = "C6"
-        elif bond_length < 2.2:
-            bond = "CW"
-        elif bond_length < 2.7:
+        elif bond_length < 2.32:
             bond = "C7"
-        elif bond_length < 2.9:
+        elif bond_length < 2.7:
             bond = "C8"
-        elif bond_length < 4:
+        elif bond_length < 2.95:
             bond = "C9"
-        else:
+        elif bond_length < 4.1:
             bond = "CX"
+        else:
+            bond = "CY"
     elif bond == "CO":
-        if bond_length < 1.2:
+        if bond_length < 1.18:
             bond = "O1"
         elif bond_length < 1.25:
             bond = "O2"
         elif bond_length < 1.4:
-            bond = "OT"
-        elif bond_length < 2:
             bond = "O3"
-        elif bond_length < 2.27:
+        elif bond_length < 2:
             bond = "O4"
-        elif bond_length < 2.5:
+        elif bond_length < 2.27:
             bond = "O5"
-        elif bond_length < 3.9:
+        elif bond_length < 2.5:
             bond = "O6"
-        else:
+        elif bond_length < 3.9:
             bond = "O7"
+        else:
+            bond = "O8"
     return bond

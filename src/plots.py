@@ -85,7 +85,8 @@ def histogram_plots(histogram_values, num_bins=200, title=None, c='blue', alpha=
     for tick in ax.get_yticklabels():
         tick.set_fontname("UGent Panno Text")
     if title is not None:
-        plt.title(title, prop=font)
+        ax.set_title(title, **hfont)
+        # plt.title(title, prop=font)
         if folder is not None:
             plt.savefig(folder + "/" + title + ".png")
         else:
@@ -119,7 +120,8 @@ def gmm_plot(histogram_values, gmm_values, title=None, c_curve='#0f4c81', c_peak
         ax.set_ylabel('Occurrence', **hfont)
         # plt.ylabel('Occurrence')
         if title is not None:
-            plt.title(title, prop=font)
+            ax.set_title(title, **hfont)
+            # plt.title(title, prop=font)
             if folder is not None:
                 plt.savefig(folder + "/" + title + ".png")
             else:
@@ -144,15 +146,23 @@ def output_plot(molecules, outputs, name="output_plot", cp_column=0, folder="new
     for mol in molecules:
         ha.append(heavy_atoms(mol))
     ha = np.asarray(ha).astype(np.float)
-    plt.rc('font', size=14)
+    hfont = {'fontname': 'UGent Panno Text'}
+    font = FontProperties(family='UGent Panno Text',
+                          weight='normal',
+                          style='normal', size=15)
+    plt.rc('font', size=16)
     fig, ax = plt.subplots()
     fig.set_size_inches(8, 6)
     for axis in ['top', 'bottom', 'left', 'right']:
         ax.spines[axis].set_linewidth(1.5)
     ax.tick_params(direction='in', top=True, right=True, color='black', width=2)
     ax.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
-    ax.set_ylabel(y_label)
-    ax.set_xlabel('Number of Heavy Atoms')
+    ax.set_ylabel(y_label, **hfont)
+    ax.set_xlabel('Number of Heavy Atoms', **hfont)
+    for tick in ax.get_xticklabels():
+        tick.set_fontname("UGent Panno Text")
+    for tick in ax.get_yticklabels():
+        tick.set_fontname("UGent Panno Text")
     plt.scatter(ha, outputs, s=2, c='b')
     location = str(folder + "/" + name + ".png")
     plt.savefig(location, format="png")
