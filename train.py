@@ -20,7 +20,7 @@ try:
 except PermissionError:
     print("No permission to create folder.\nThere are two ways to solve the problem:\n"
           "1) Open Anaconda as Administrator\n"
-          "2) Manually create the subfolder Output with 2 additional subfolders in Output: gmm and hist")
+          "2) Manually create the subdirectory Output with 2 additional subdirectories in Output: gmm and hist")
     raise
 except FileExistsError:
     print("Folder already exists.")
@@ -46,7 +46,8 @@ except FileNotFoundError:
     raise
 
 if property != "cp":
-    output_plot(molecule_file, folder=save_folder)
+    output_plot(molecules, outputs, folder=save_folder)
+    print("Created an output plot!")
 if len(bad_molecules) > 0:
     np.savetxt("/Output/bad_molecules.txt", bad_molecules, fmt="%s")
     print("Dumped a list with molecules which could not be parsed in Output/bad_molecules.txt")
@@ -85,9 +86,10 @@ for key in histogram_dict:
     gmm_plot(v, t, title=key, folder=str(save_folder + "/gmm"), metric=metric, unit=unit)
     histogram_plots(v, title=key, folder=str(save_folder + "/hist"), metric=metric, unit=unit)
 
+# TODO: Pop bad molecules
 print("Created plots and saved them!")
 print("Start representing the molecules!")
-representations = represent(molecules, gmm_dictionary)
+representations, bad = represent(molecules, gmm_dictionary)
 print("Finished representing the molecules")
 
 with open(str(save_folder + "/representations.pickle"), "wb") as f:
@@ -100,7 +102,7 @@ else:
     heavy_atoms = np.asarray([heavy_atoms(mol) for mol in molecules])
 
 n_folds = 10  # TODO: Make argument
-kf = KFold(n_folds, shuffle=True, random_state=912)
+kf = KFold(n_folds, shuffle=True, random_state=1012)
 
 cpu = cpu_count()
 if n_folds > cpu:
