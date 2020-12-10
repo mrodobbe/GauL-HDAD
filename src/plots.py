@@ -1,10 +1,16 @@
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 from matplotlib.font_manager import FontProperties
-from src.gaussian import gauss
 import numpy as np
 import math
-from src.makeMolecule import molecule_list, heavy_atoms
+from src.makeMolecule import heavy_atoms
+
+
+def gauss(x, x0, sigma):
+    """
+    This function returns a Gaussian distribution.
+    """
+    return (1/(sigma*math.sqrt(2 * math.pi))) * np.exp(-(x - x0)**2 / (2 * sigma**2))
 
 
 def performance_plot(outputs, predictions, test, prop, folder="newPredictions", fold=0, model="ANN"):

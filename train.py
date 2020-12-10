@@ -54,7 +54,7 @@ if len(bad_molecules) > 0:
 else:
     print("All molecules can be parsed by RDKit")
 
-gmm_dict = gmm(molecules)
+gmm_dict = gmm(molecules, save_folder)
 print("Successfully finished clustering all geometry features!")
 # TODO: Bad molecules must be popped from lists
 # TODO: Put these lines somewhere in the background
@@ -74,17 +74,17 @@ gmm_dictionary = gmm_dict[0]
 
 # TODO: Make function for plotting
 
-for key in histogram_dict:
-    v = histogram_dict[key]
-    t = gmm_dictionary[key]
-    if len(key) == 2:
-        metric = "Distance"
-        unit = "Å"
-    else:
-        metric = "Angle"
-        unit = "rad"
-    gmm_plot(v, t, title=key, folder=str(save_folder + "/gmm"), metric=metric, unit=unit)
-    histogram_plots(v, title=key, folder=str(save_folder + "/hist"), metric=metric, unit=unit)
+# for key in histogram_dict:
+#     v = histogram_dict[key]
+#     t = gmm_dictionary[key]
+#     if len(key) == 2:
+#         metric = "Distance"
+#         unit = "Å"
+#     else:
+#         metric = "Angle"
+#         unit = "rad"
+#     gmm_plot(v, t, title=key, folder=str(save_folder + "/gmm"), metric=metric, unit=unit)
+#     histogram_plots(v, title=key, folder=str(save_folder + "/hist"), metric=metric, unit=unit)
 
 # TODO: Pop bad molecules
 print("Created plots and saved them!")
