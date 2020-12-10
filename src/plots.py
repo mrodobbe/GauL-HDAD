@@ -64,7 +64,7 @@ def performance_plot(outputs, predictions, test, prop, folder="newPredictions", 
 #     Pantone Fiery Red: #D01C1F
 
 
-def histogram_plots(histogram_values, num_bins=200, title=None, c='blue', alpha=0.5,
+def histogram_plots(histogram_values, num_bins=200, title=None, c='#0F4C81', alpha=0.5,
                     folder=None, metric=None, unit=None):
     plt.figure()
     hfont = {'fontname': 'UGent Panno Text'}
