@@ -1,4 +1,5 @@
 from src.createHistograms import all_values
+from src.plots import store_histograms, store_gaussians
 import math
 import numpy as np
 from joblib import Parallel, cpu_count, delayed
@@ -85,9 +86,10 @@ def gaussian_mixture_model(geometry_type, values):
     return theta_opt, LL
 
 
-def gmm(data):
+def gmm(data, save_folder):
     print("Start calculating all geometry features.")
     geometry_dict, bad = all_values(data)
+    store_histograms(geometry_dict, save_folder)
     for key in geometry_dict:
         print(key)
     ll_dict = {}
@@ -97,6 +99,7 @@ def gmm(data):
     for key, i in zip(geometry_dict, range(len(geometry_dict))):
         gmm_dict[key] = gmm_info[i][0]
         ll_dict[key] = gmm_info[i][1]
+    store_gaussians(geometry_dict, gmm_dict, save_folder)
     return gmm_dict, ll_dict, geometry_dict, bad
 
 
