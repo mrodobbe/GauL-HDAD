@@ -1,7 +1,7 @@
 import numpy as np
 from src.geometryFeatures import bonds, angles, dihedrals
 from src.gaussian import gauss
-from src.makeMolecule import conformer, input_type
+from src.makeMolecule import conformer, input_type, add_radical
 
 
 def gaul_representation(mol, theta_dict):
@@ -76,4 +76,5 @@ def represent(molecules, gmm_dict):
         r = np.asarray(v)
         representations.append(r)
     stacked_representations = np.stack(representations)
+    stacked_representations = add_radical(molecules, stacked_representations)
     return stacked_representations, bad
