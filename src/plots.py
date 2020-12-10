@@ -61,12 +61,25 @@ def performance_plot(outputs, predictions, test, prop, folder="newPredictions", 
 def histogram_plots(histogram_values, num_bins=200, title=None, c='blue', alpha=0.5,
                     folder=None, metric=None, unit=None):
     plt.figure()
+    hfont = {'fontname': 'UGent Panno Text'}
+    font = FontProperties(family='UGent Panno Text',
+                          weight='normal',
+                          style='normal', size=15)
+    plt.rc('font', size=16)
+    fig, ax = plt.subplots()
+    fig.set_size_inches(8, 6)
     plt.hist(histogram_values, num_bins, facecolor=c, alpha=alpha)
     if metric is not None and unit is not None:
-        plt.xlabel(str(metric + " [" + unit + "]"))
-    plt.ylabel('Occurrence')
+        ax.set_xlabel(str(metric + " [" + unit + "]"), **hfont)
+        # plt.xlabel(str(metric + " [" + unit + "]"))
+    ax.set_ylabel('Occurrence', **hfont)
+    # plt.ylabel('Occurrence')
+    for tick in ax.get_xticklabels():
+        tick.set_fontname("UGent Panno Text")
+    for tick in ax.get_yticklabels():
+        tick.set_fontname("UGent Panno Text")
     if title is not None:
-        plt.title(title)
+        plt.title(title, prop=font)
         if folder is not None:
             plt.savefig(folder + "/" + title + ".png")
         else:
@@ -78,16 +91,29 @@ def histogram_plots(histogram_values, num_bins=200, title=None, c='blue', alpha=
 def gmm_plot(histogram_values, gmm_values, title=None, c_curve='#0f4c81', c_peak='#ea733d',
              folder=None, metric=None, unit=None):
     plt.figure()
+    hfont = {'fontname': 'UGent Panno Text'}
+    font = FontProperties(family='UGent Panno Text',
+                          weight='normal',
+                          style='normal', size=15)
+    plt.rc('font', size=16)
+    fig, ax = plt.subplots()
+    fig.set_size_inches(8, 6)
+    for tick in ax.get_xticklabels():
+        tick.set_fontname("UGent Panno Text")
+    for tick in ax.get_yticklabels():
+        tick.set_fontname("UGent Panno Text")
     ls = np.arange(min(histogram_values), max(histogram_values), 0.001)
     for mu, sigma in gmm_values:
         gd = gauss(ls, mu, sigma)
         plt.plot(ls, gd, c=c_curve)
         plt.plot(mu, 1/(sigma*math.sqrt(2*math.pi)), "x", c=c_peak)
         if metric is not None and unit is not None:
-            plt.xlabel(str(metric + " [" + unit + "]"))
-        plt.ylabel('Occurrence')
+            ax.set_xlabel(str(metric + " [" + unit + "]"), **hfont)
+            # plt.xlabel(str(metric + " [" + unit + "]"))
+        ax.set_ylabel('Occurrence', **hfont)
+        # plt.ylabel('Occurrence')
         if title is not None:
-            plt.title(title)
+            plt.title(title, prop=font)
             if folder is not None:
                 plt.savefig(folder + "/" + title + ".png")
             else:
@@ -125,3 +151,30 @@ def output_plot(molecules, outputs, name="output_plot", cp_column=0, folder="new
     location = str(folder + "/" + name + ".png")
     plt.savefig(location, format="png")
     # plt.show()
+
+
+def store_histograms(histogram_dict, save_folder):
+    for key in histogram_dict:
+        v = histogram_dict[key]
+        if len(key) == 2:
+            metric = "Distance"
+            unit = "Å"
+        else:
+            metric = "Angle"
+            unit = "rad"
+        histogram_plots(v, title=key, folder=str(save_folder + "/hist"), metric=metric, unit=unit)
+    print("Stored all histogram plots in {}".format(str(save_folder + "/hist")))
+
+
+def store_gaussians(histogram_dict, gmm_dictionary, save_folder):
+    for key in histogram_dict:
+        v = histogram_dict[key]
+        t = gmm_dictionary[key]
+        if len(key) == 2:
+            metric = "Distance"
+            unit = "Å"
+        else:
+            metric = "Angle"
+            unit = "rad"
+        gmm_plot(v, t, title=key, folder=str(save_folder + "/gmm"), metric=metric, unit=unit)
+    print("Stored all gmm plots in {}".format(str(save_folder + "/gmm")))
