@@ -43,19 +43,18 @@ def molecule_list(molecule_file, suppress="no"):
 
     for line in molecules_full:
         line = line[:-1].split('\t')
-
         # Check if the molecule can be handled by RDKit
         # TODO: The parsing step takes too much time ==> Optimize!
-
-        try:
-            conformer(line[0])
-        except ValueError:
+        if not input_type(line):
             try:
                 conformer(line[0])
             except ValueError:
-                print("{} is a bad molecule!".format(line[0]))
-                bad_molecules.append(line[0])
-                continue
+                try:
+                    conformer(line[0])
+                except ValueError:
+                    print("{} is a bad molecule!".format(line[0]))
+                    bad_molecules.append(line[0])
+                    continue
 
         # TODO: Instead of removing the molecule, a method must be created to figure out the coordinates of the molecule
 
@@ -70,7 +69,7 @@ def molecule_list(molecule_file, suppress="no"):
         if len(line) > 2:
             outputs.append(line[1:])
         else:
-            if len(line[0].split(' ')) > 1:
+            if len(line) == 1 and len(line[0].split(' ')) > 1:
                 line = line[0].split(' ')
                 outputs.append(line[1:])
             else:
