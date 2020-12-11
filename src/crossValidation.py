@@ -116,8 +116,8 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_v
 
     with open(str(save_folder + "/Fold {}/test_results_fold_{}.txt".format(i, i)), "w") as f:
         f.write('ANN Test performance statistics:\n')
-        f.write('Mean absolute error:\t\t{:.2f} kJ/mol\n'.format(validation_mean_absolute_error))
-        f.write('Root mean squared error:\t{:.2f} kJ/mol\n\n'.format(validation_root_mean_squared_error))
+        f.write('Mean absolute error:\t\t{:.2f} kJ/mol\n'.format(test_mean_absolute_error))
+        f.write('Root mean squared error:\t{:.2f} kJ/mol\n\n'.format(test_root_mean_squared_error))
         if target != "cp":
             f.write('SVR Test performance statistics:\n')
             f.write('Mean absolute error:\t\t{:.2f} kJ/mol\n'.format(svr_mean_absolute_error))
@@ -151,6 +151,6 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_v
             f.close()
 
         return test_mean_absolute_error, test_root_mean_squared_error, \
-               svr_mean_absolute_error, svr_root_mean_squared_error
+            svr_mean_absolute_error, svr_root_mean_squared_error
     else:
         return test_mean_absolute_error, test_root_mean_squared_error
