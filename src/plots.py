@@ -14,21 +14,25 @@ def gauss(x, x0, sigma):
 
 
 def performance_plot(outputs, predictions, test, prop, folder="newPredictions", fold=0, model="ANN"):
+    if prop == "h" or prop == "Enthalpy":
+        prop = "Enthalpy"
+        metric = "kJ mol$^{-1}$"
+    elif prop == "s" or prop == "Entropy":
+        prop = "Entropy"
+        metric = "J mol$^{-1}$ K$^{-1}$"
+    elif prop == "cp" or prop == "Heat Capacity":
+        prop = "Heat Capacity"
+        metric = "J mol$^{-1}$ K$^{-1}$"
+        outputs = outputs[:, 0]
+        predictions = predictions[:, 0]
+    else:
+        metric = "-"
     if "test" in test:
         name = "testResults"
     elif "validation" in test:
         name = "validationResults"
     else:
         name = str(test + "_plot")
-    if prop == "Enthalpy":
-        metric = "kJ mol$^{-1}$"
-    elif prop == "Entropy" or prop == "cp" or prop == "Heat Capacity":
-        metric = "J mol$^{-1}$ K$^{-1}$"
-    else:
-        metric = "-"
-    if prop == "cp":
-        outputs = outputs[:, 0]
-        predictions = predictions[:, 0]
     hfont = {'fontname': 'UGent Panno Text'}
     font = FontProperties(family='UGent Panno Text',
                           weight='normal',
@@ -53,7 +57,7 @@ def performance_plot(outputs, predictions, test, prop, folder="newPredictions", 
     plt.plot([min(outputs), max(outputs)], [min(outputs) - 10, max(outputs) - 10],
              c='#FFA44A', linestyle='--')
     plt.legend(loc='best', prop=font)
-    plt.savefig(str(folder + "/" + name + "_" + model + prop + str(fold) + ".png"))
+    plt.savefig(str(folder + "/" + name + "_" + model + "_" + prop + "_" + str(fold) + ".png"))
 
 #     UGent yellow: #FFD200
 #     Pantone Classic Blue: #0F4C81
