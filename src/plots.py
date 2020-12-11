@@ -74,8 +74,8 @@ def histogram_plots(histogram_values, num_bins=200, title=None, c='#0F4C81', alp
     hfont = {'fontname': 'UGent Panno Text'}
     font = FontProperties(family='UGent Panno Text',
                           weight='normal',
-                          style='normal', size=15)
-    plt.rc('font', size=16)
+                          style='normal', size=20)
+    plt.rc('font', size=20)
     fig, ax = plt.subplots()
     fig.set_size_inches(8, 6)
     plt.hist(histogram_values, num_bins, facecolor=c, alpha=alpha)
@@ -105,8 +105,8 @@ def gmm_plot(histogram_values, gmm_values, title=None, c_curve='#0f4c81', c_peak
     hfont = {'fontname': 'UGent Panno Text'}
     font = FontProperties(family='UGent Panno Text',
                           weight='normal',
-                          style='normal', size=15)
-    plt.rc('font', size=16)
+                          style='normal', size=20)
+    plt.rc('font', size=20)
     fig, ax = plt.subplots()
     fig.set_size_inches(8, 6)
     for tick in ax.get_xticklabels():
