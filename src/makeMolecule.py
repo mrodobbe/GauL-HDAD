@@ -2,7 +2,6 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, rdmolfiles, Descriptors
 from rdkit.Chem.rdMolTransforms import ComputePrincipalAxesAndMoments as Inertia
 from rdkit.Chem.Descriptors import NumRadicalElectrons
-from openbabel import pybel
 import numpy as np
 import math
 
@@ -98,22 +97,16 @@ def molecule(line):
     if line.__contains__("InChI"):  # Molecule in InChI format
         return Chem.MolFromInchi(line)
     elif ":" in line:  # Molecule as parsed.mol file
-        mol_file = str(line + "/parsed.mol")
-        mol = next(pybel.readfile("mol", mol_file))
-        mol = mol.OBMol
-        n = mol.NumAtoms()
-        xv = []
-        yv = []
-        zv = []
-        for i in range(n):
-            xv.append(mol.GetAtomById(i).GetX())
-            yv.append(mol.GetAtomById(i).GetY())
-            zv.append(mol.GetAtomById(i).GetZ())
-        xyz = list(zip(xv, yv, zv))
-        if str(xyz).__contains__('nan'):
-            print("The coordinates of {} are incorrect!".format(mol_file))
-            raise ValueError
-        return mol
+        if line.endswith(".xyz"):
+            mol_file = str(line[:-8] + "/parsed.mol")
+        elif line.endswith(".mol"):
+            mol_file = line
+        elif line[-3] == "." or line[-4] == ".":
+            print("Unknown file format.\nPlease make for each molecule a folder with a parsed.mol file.")
+            raise NameError
+        else:
+            mol_file = str(line + "/parsed.mol")
+        return rdmolfiles.MolFromMolFile(mol_file, removeHs=False)
     else:  # Molecule as SMILES
         return Chem.MolFromSmiles(line)
 
@@ -136,19 +129,18 @@ def conformer(mol_name):
     """
     if not input_type(mol_name):
         mol = molecule(mol_name)
-        # for c in mol.GetConformers():
-        #     print(c.GetPositions())
-        return mol
+        conf = mol.GetConformer()
+        n = mol.GetNumAtoms()
+        return conf, n, mol
     else:
         mol = molecule(mol_name)
         mol_h = Chem.AddHs(mol)
         AllChem.EmbedMolecule(mol_h, useRandomCoords=True)
         try:
-            AllChem.MMFFOptimizeMolecule(mol_h)
+            AllChem.MMFFOptimizeMolecule(mol_h, maxIters=10000)
         except ValueError:
             try:
-                AllChem.EmbedMolecule(mol_h, useRandomCoords=True)
-                AllChem.UFFOptimizeMolecule(mol_h)
+                AllChem.UFFOptimizeMolecule(mol_h, maxIters=10000)
             except ValueError:
                 pass
         return mol_h.GetConformer(), mol_h.GetNumAtoms(), mol_h
