@@ -104,9 +104,10 @@ else:
     heavy_atoms = np.asarray([heavy_atoms(mol) for mol in molecules])
 
 n_folds = 10  # TODO: Make argument
-kf = KFold(n_folds, shuffle=True, random_state=1012)
+kf = KFold(n_folds, shuffle=True, random_state=12081997)
 
-cpu = cpu_count()
+# cpu = cpu_count()
+cpu = 2
 if n_folds > cpu:
     n_jobs = cpu
 else:

@@ -27,6 +27,7 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_v
 
     n = len(y_train_all)
     indices = np.arange(n)
+    np.random.seed(seed=12081997)
     np.random.shuffle(indices)
     n_val = round(train_val_split * n)
     val_index = indices[n_val:]
