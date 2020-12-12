@@ -7,21 +7,11 @@ from src.makeMolecule import conformer, input_type, add_radical
 def gaul_representation(mol, theta_dict):
     print(mol)
     representation_dict = {}
-    if input_type(mol):
-        conf, n, mol_h = conformer(mol)
-        dist = bonds(conf, n, mol_h)
-        angs = angles(conf, n, mol_h)
-        dihs = dihedrals(conf, n, mol_h)
-        geo = (dist[0] + angs[0] + dihs[0], dist[1] + angs[1] + dihs[1])
-
-        # TODO: Add OpenBabel
-
-    # else:
-    #     mol_h = conformer(mol)
-    #     dist = bonds_ob(mol_h)
-    #     angs = angles_ob(mol_h)
-    #     dihs = dihedrals_ob(mol_h)
-    #     geo = (dist[0] + angs[0] + dihs[0], dist[1] + angs[1] + dihs[1])
+    conf, n, mol_h = conformer(mol)
+    dist = bonds(conf, n, mol_h)
+    angs = angles(conf, n, mol_h)
+    dihs = dihedrals(conf, n, mol_h)
+    geo = (dist[0] + angs[0] + dihs[0], dist[1] + angs[1] + dihs[1])
     for key in theta_dict:
         q = theta_dict[key]
         t = np.asarray(q)

@@ -32,12 +32,12 @@ def all_values(data):
             angs = angles(conf, n, mol_h)
             dihs = dihedrals(conf, n, mol_h)
             geo = (dist[0] + angs[0] + dihs[0], dist[1] + angs[1] + dihs[1])
-        # else:
-        #     mol_h = conformer(mol)
-        #     dist = bonds_ob(mol_h)
-        #     angs = angles_ob(mol_h)
-        #     dihs = dihedrals_ob(mol_h)
-        #     geo = (dist[0] + angs[0] + dihs[0], dist[1] + angs[1] + dihs[1])
+        else:
+            conf, n, mol_h = conformer(mol)
+            dist = bonds(conf, n, mol_h)
+            angs = angles(conf, n, mol_h)
+            dihs = dihedrals(conf, n, mol_h)
+            geo = (dist[0] + angs[0] + dihs[0], dist[1] + angs[1] + dihs[1])
         for value, name in zip(*geo):
             # print(value, name)
             if name in hist_input:

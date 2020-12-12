@@ -167,7 +167,7 @@ def output_plot(molecules, outputs, name="output_plot", cp_column=0, folder="new
         tick.set_fontname("UGent Panno Text")
     for tick in ax.get_yticklabels():
         tick.set_fontname("UGent Panno Text")
-    plt.scatter(ha, outputs, s=2, c='b')
+    plt.scatter(ha, outputs, s=6, c='#0F4C81', alpha=0.1)
     location = str(folder + "/" + name + ".png")
     plt.savefig(location, format="png")
     # plt.show()

@@ -46,6 +46,8 @@ except FileNotFoundError:
     raise
 
 if property != "cp":
+    # TODO: Making a plot takes too long!
+    print("Making a plot of the output distribution...")
     output_plot(molecules, outputs, folder=save_folder)
     print("Created an output plot!")
 if len(bad_molecules) > 0:
