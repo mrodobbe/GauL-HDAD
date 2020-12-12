@@ -52,12 +52,12 @@ def performance_plot(outputs, predictions, test, prop, folder="newPredictions", 
         tick.set_fontname("UGent Panno Text")
     plt.plot([min(outputs), max(outputs)], [min(outputs), max(outputs)], c='#D01C1F', linewidth=1.5, label='Parity')
     plt.scatter(outputs, predictions, s=6, c='#0F4C81', label='Data points')
-    plt.plot([min(outputs), max(outputs)], [min(outputs) + 10, max(outputs) + 10],
-             c='#FFA44A', label='$\pm$ 10 J mol$^{-1}$ K$^{-1}$', linestyle='--')
-    plt.plot([min(outputs), max(outputs)], [min(outputs) - 10, max(outputs) - 10],
-             c='#FFA44A', linestyle='--')
+    # plt.plot([min(outputs), max(outputs)], [min(outputs) + 10, max(outputs) + 10],
+    #          c='#FFA44A', label='$\pm$ 10 J mol$^{-1}$ K$^{-1}$', linestyle='--')
+    # plt.plot([min(outputs), max(outputs)], [min(outputs) - 10, max(outputs) - 10],
+    #          c='#FFA44A', linestyle='--')
     plt.legend(loc='best', prop=font)
-    plt.savefig(str(folder + "/" + name + "_" + model + "_" + prop + "_" + str(fold) + ".png"))
+    plt.savefig(str(folder + "/" + name + "_" + model + "_" + prop + "_" + str(fold) + ".png"), bbox_inches='tight')
 
 #     UGent yellow: #FFD200
 #     Pantone Classic Blue: #0F4C81
@@ -92,7 +92,7 @@ def histogram_plots(histogram_values, num_bins=200, title=None, c='#0F4C81', alp
         ax.set_title(title, **hfont)
         # plt.title(title, prop=font)
         if folder is not None:
-            plt.savefig(folder + "/" + title + ".png")
+            plt.savefig(folder + "/" + title + ".png", bbox_inches='tight')
         else:
             plt.show()
     else:
@@ -127,7 +127,7 @@ def gmm_plot(histogram_values, gmm_values, title=None, c_curve='#0f4c81', c_peak
             ax.set_title(title, **hfont)
             # plt.title(title, prop=font)
             if folder is not None:
-                plt.savefig(folder + "/" + title + ".png")
+                plt.savefig(folder + "/" + title + ".png", bbox_inches='tight')
             else:
                 plt.show()
         else:
@@ -169,7 +169,7 @@ def output_plot(molecules, outputs, name="output_plot", cp_column=0, folder="new
         tick.set_fontname("UGent Panno Text")
     plt.scatter(ha, outputs, s=6, c='#0F4C81', alpha=0.1)
     location = str(folder + "/" + name + ".png")
-    plt.savefig(location, format="png")
+    plt.savefig(location, format="png", bbox_inches='tight')
     # plt.show()
 
 
