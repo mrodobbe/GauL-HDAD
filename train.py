@@ -106,8 +106,8 @@ else:
 n_folds = 10  # TODO: Make argument
 kf = KFold(n_folds, shuffle=True, random_state=12081997)
 
-# cpu = cpu_count()
-cpu = 2
+cpu = cpu_count()
+# cpu = 2
 if n_folds > cpu:
     n_jobs = cpu
 else:
