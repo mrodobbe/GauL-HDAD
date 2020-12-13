@@ -95,8 +95,12 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_v
         krr.fit(training_intermediates, y_train_all)  # Execute regression
 
         y_svr = krr.predict(test_intermediates)  # Prediction for the test set (unseen data)
-        y_svr = denormalize(y_svr, heavy_test, target, coefficient=1.5)
-        svr_error = np.abs(y_svr - y_test)
+        if target == "s":
+            y_svr = denormalize(y_svr, heavy_test, target, coefficient=1.5)
+            y_test_svr = denormalize(y_test, heavy_test, target, coefficient=1.5)
+        else:
+            y_test_svr = y_test
+        svr_error = np.abs(y_svr - y_test_svr)
         svr_mean_absolute_error = np.average(svr_error)
         svr_root_mean_squared_error = np.sqrt(np.average(svr_error ** 2))
 
