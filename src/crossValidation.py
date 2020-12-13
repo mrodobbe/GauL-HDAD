@@ -85,6 +85,25 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_v
     else:
         test_predictions = np.asarray(model.predict(x_test)).astype(np.float)
 
+    if target != "cp":
+        intermediate_layer = Model(inputs=model.input, outputs=model.get_layer('layer_3').output)
+        training_intermediates = np.asarray(intermediate_layer(x_train_all)).astype(np.float)
+        test_intermediates = np.asarray(intermediate_layer(x_test)).astype(np.float)
+
+        krr = SVR(kernel="rbf", gamma='scale', C=2.5e3)  # This is the support vector machine.
+        # Try to find an algorithm that optimizes gamma and C. You can also add an epsilon factor
+        krr.fit(training_intermediates, y_train_all)  # Execute regression
+
+        y_svr = krr.predict(test_intermediates)  # Prediction for the test set (unseen data)
+        y_svr = denormalize(y_svr, heavy_test, target, coefficient=1.5)
+        svr_error = np.abs(y_svr - y_test)
+        svr_mean_absolute_error = np.average(svr_error)
+        svr_root_mean_squared_error = np.sqrt(np.average(svr_error ** 2))
+
+        print('Test performance statistics for SVR:')
+        print('Mean absolute error:\t\t{:.2f} kJ/mol'.format(svr_mean_absolute_error))
+        print('Root mean squared error:\t{:.2f} kJ/mol'.format(svr_root_mean_squared_error))
+
     if target != "h":
         test_predictions = denormalize(test_predictions, heavy_test, target, coefficient=1.5)
         y_test = denormalize(y_test, heavy_test, target, coefficient=1.5)
@@ -96,24 +115,6 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_v
     print('Test performance statistics for ANN:')
     print('Mean absolute error:\t\t{:.2f} kJ/mol'.format(test_mean_absolute_error))
     print('Root mean squared error:\t{:.2f} kJ/mol'.format(test_root_mean_squared_error))
-
-    if target != "cp":
-        intermediate_layer = Model(inputs=model.input, outputs=model.get_layer('layer_3').output)
-        training_intermediates = np.asarray(intermediate_layer(x_train_all)).astype(np.float)
-        test_intermediates = np.asarray(intermediate_layer(x_test)).astype(np.float)
-
-        krr = SVR(kernel="rbf", gamma='scale', C=2.5e3)  # This is the support vector machine.
-        # Try to find an algorithm that optimizes gamma and C. You can also add an epsilon factor
-        krr.fit(training_intermediates, y_train_all)  # Execute regression
-
-        y_svr = krr.predict(test_intermediates)  # Prediction for the test set (unseen data)
-        svr_error = np.abs(y_svr - y_test)
-        svr_mean_absolute_error = np.average(svr_error)
-        svr_root_mean_squared_error = np.sqrt(np.average(svr_error ** 2))
-
-        print('Test performance statistics for SVR:')
-        print('Mean absolute error:\t\t{:.2f} kJ/mol'.format(svr_mean_absolute_error))
-        print('Root mean squared error:\t{:.2f} kJ/mol'.format(svr_root_mean_squared_error))
 
     with open(str(save_folder + "/Fold {}/test_results_fold_{}.txt".format(i, i)), "w") as f:
         f.write('ANN Test performance statistics:\n')
