@@ -44,7 +44,7 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_v
     else:
         output_layer_size = 1
 
-    model = model_builder(x_train_all, output_layer_size)
+    model = model_builder(x_train_all, output_layer_size, target)
     model.summary()
 
     print('{} training molecules, {} validation molecules'.format(len(x_train),
