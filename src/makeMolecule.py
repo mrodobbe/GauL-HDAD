@@ -165,6 +165,7 @@ def normalize(molecules, outputs, thermo, coefficient=None):
         normed = output / (math.log10(ha) ** coefficient)
         normalized_output.append(normed)
     normalized_output = np.asarray(normalized_output).astype(np.float)
+    heavy = np.asarray(heavy)
     return normalized_output, heavy
 
 
