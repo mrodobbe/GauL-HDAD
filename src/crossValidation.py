@@ -133,7 +133,11 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_v
     with open(str(save_folder + "/Fold {}/test_predictions_{}.txt".format(i, i)), "w") as f:
         f.write(str("Molecule \t Real Value \t Prediction \t Absolute Error \n"))
         for m, v, p, e in zip(test_molecules, y_test, test_predictions, test_error):
-            f.write(str(m) + '\t' + str(round(v, 4)) + '\t' + str(round(p, 4)) + '\t' + str(round(e, 4)) + '\n')
+            if target == "cp":
+                f.write(str(m) + '\t' + str(round(v[0], 4)) + '\t' + str(round(p[0], 4)) + '\t' +
+                        str(round(e[0], 4)) + '\n')
+            else:
+                f.write(str(m) + '\t' + str(round(v, 4)) + '\t' + str(round(p, 4)) + '\t' + str(round(e, 4)) + '\n')
         f.close()
 
     with open(str(save_folder + "/Fold {}/test_representations_fold_{}.pickle".format(i, i)), "wb") as f:

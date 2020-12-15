@@ -45,7 +45,7 @@ def molecule_list(molecule_file, suppress="no"):
         line = line[:-1].split('\t')
         # Check if the molecule can be handled by RDKit
         # TODO: The parsing step takes too much time ==> Optimize!
-        if not input_type(line):
+        if input_type(line):
             try:
                 conformer(line[0])
             except ValueError:

@@ -14,7 +14,8 @@ from joblib import Parallel, delayed, cpu_count
 start = time.time()
 
 # TODO: Add argument for user-defined output folder
-save_folder = "./Output"
+save_folder = sys.argv[3]
+# save_folder = "./Output"
 try:
     os.mkdir(save_folder)
 except PermissionError:
@@ -107,7 +108,7 @@ n_folds = 10  # TODO: Make argument
 kf = KFold(n_folds, shuffle=True, random_state=12081997)
 
 cpu = cpu_count()
-cpu = 4
+# cpu = 4
 if n_folds > cpu:
     n_jobs = cpu
 else:
