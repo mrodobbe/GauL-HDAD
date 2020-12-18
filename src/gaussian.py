@@ -93,7 +93,7 @@ def gmm(data, save_folder):
         print(key)
     ll_dict = {}
     gmm_dict = {}
-    n_jobs = cpu_count()
+    n_jobs = cpu_count()-5
     gmm_info = Parallel(n_jobs=n_jobs)(delayed(run_gmm)(keg, geometry_dict) for keg in geometry_dict)
     for key, i in zip(geometry_dict, range(len(geometry_dict))):
         gmm_dict[key] = gmm_info[i][0]
