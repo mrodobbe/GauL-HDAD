@@ -212,4 +212,15 @@ def cc(bond, bond_length):
             bond = "O7"
         else:
             bond = "O8"
+    elif bond == "CN":
+        if bond_length < 1.2:
+            bond = "N1"
+        elif bond_length < 1.3:
+            bond = "N2"
+        elif bond_length < 1.4:
+            bond = "N3"
+        elif bond_length < 1.8:
+            bond = "N4"
+        else:
+            bond = "N5"
     return bond
