@@ -22,6 +22,7 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_v
 
     x_train_all = x[train]
     y_train_all = y[train]
+
     x_test = x[test]
     y_test = y[test]
 
@@ -85,11 +86,21 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_v
     else:
         test_predictions = np.asarray(model.predict(x_test)).astype(np.float)
 
-    if target != "cp":
-        intermediate_layer = Model(inputs=model.input, outputs=model.get_layer('layer_3').output)
-        training_intermediates = np.asarray(intermediate_layer(x_train_all)).astype(np.float)
-        test_intermediates = np.asarray(intermediate_layer(x_test)).astype(np.float)
+    intermediate_layer = Model(inputs=model.input, outputs=model.get_layer('layer_3').output)
+    training_intermediates = np.asarray(intermediate_layer(x_train_all)).astype(np.float)
+    test_intermediates = np.asarray(intermediate_layer(x_test)).astype(np.float)
 
+    with open(str(save_folder + "/Fold {}/training_intermediates_fold_{}.pickle".format(i, i)), "wb") as f:
+        pickle.dump(training_intermediates, f)
+    print("Dumped the training intermediates!")
+
+    with open(str(save_folder + "/Fold {}/test_intermediates_fold_{}.pickle".format(i, i)), "wb") as f:
+        pickle.dump(test_intermediates, f)
+    print("Dumped the test intermediates!")
+
+    np.savetxt(str(save_folder + "/Fold {}/training_outputs.txt".format(i, i)), y_train_all, fmt="%.4f")
+
+    if target != "cp":
         krr = SVR(kernel="rbf", gamma='scale', C=2.5e3)  # This is the support vector machine.
         # Try to find an algorithm that optimizes gamma and C. You can also add an epsilon factor
         krr.fit(training_intermediates, y_train_all)  # Execute regression
@@ -115,6 +126,8 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target, train_v
     test_error = np.abs(test_predictions - y_test)
     test_mean_absolute_error = np.average(test_error)
     test_root_mean_squared_error = np.sqrt(np.average(test_error ** 2))
+
+    np.savetxt(str(save_folder + "/Fold {}/test_errors.txt".format(i, i)), test_error, fmt="%.4f")
 
     print('Test performance statistics for ANN:')
     print('Mean absolute error:\t\t{:.2f} kJ/mol'.format(test_mean_absolute_error))

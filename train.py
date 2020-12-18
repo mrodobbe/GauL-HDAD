@@ -52,7 +52,7 @@ if property != "cp":
     output_plot(molecules, outputs, folder=save_folder)
     print("Created an output plot!")
 if len(bad_molecules) > 0:
-    np.savetxt("/Output/bad_molecules.txt", bad_molecules, fmt="%s")
+    np.savetxt(str(save_folder + "/bad_molecules.txt"), bad_molecules, fmt="%s")
     print("Dumped a list with molecules which could not be parsed in Output/bad_molecules.txt")
 else:
     print("All molecules can be parsed by RDKit")
