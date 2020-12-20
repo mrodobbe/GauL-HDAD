@@ -25,22 +25,25 @@ def gaul_representation(mol, theta_dict):
             if name == key:
                 theta = np.asarray(theta_dict[key])
                 break
-        if len(theta.shape) > 1:
-            for mu, sig in theta:
-                gd = gauss(value, mu, sig)
-                g.append(gd)
-            gs = sum(g)
-            if gs == 0:
-                continue
+        try:
+            if len(theta.shape) > 1:
+                for mu, sig in theta:
+                    gd = gauss(value, mu, sig)
+                    g.append(gd)
+                gs = sum(g)
+                if gs == 0:
+                    continue
+                else:
+                    gt = g/gs
+            elif name == "C1":
+                gt = [1]
+            elif name == "O1":
+                gt = [1]
             else:
-                gt = g/gs
-        elif name == "C1":
-            gt = [1]
-        elif name == "O1":
-            gt = [1]
-        else:
-            gd = gauss(value, theta[0], theta[1])
-            g.append(gd)
+                gd = gauss(value, theta[0], theta[1])
+                g.append(gd)
+        except UnboundLocalError:
+            continue
         for feat in representation_dict:
             if name == feat:
                 representation_dict[feat] = np.add(representation_dict[feat], gt)

@@ -40,7 +40,9 @@ except FileNotFoundError:
         with open(str(save_folder + "/gmm_dictionary.pickle"), "rb") as f:
             gmm_dictionary = pickle.load(f)
         print("Loaded the GMM data!")
-        representations = represent(molecules, gmm_dictionary)
+        representations, bad = represent(molecules, gmm_dictionary)
+        molecules = np.delete(molecules, bad)
+        outputs = np.delete(outputs, bad)
     except FileNotFoundError:
         print("No gmm dictionary found. Select another folder or use train.py")
         raise
