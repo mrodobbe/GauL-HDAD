@@ -35,8 +35,8 @@ def gaul_representation(mol, theta_dict):
                     continue
                 else:
                     gt = g/gs
-            # elif name == "C1":
-            #     gt = [1]
+            elif name == "C1":
+                gt = [1]
             elif name == "O1":
                 gt = [1]
             else:
