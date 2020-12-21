@@ -23,7 +23,7 @@ def gaussian_mixture_model(geometry_type, values):
     """
     GMM of one type
     """
-    peak_file = open("Dataset/Cyclic/list_peaks_qm9.txt", 'r')
+    peak_file = open("list_peaks_qm9.txt", 'r')
     # peak_file = open("list_peaks.txt", 'r')
     # peak_file = open("Dataset/Cyclic/list_peaks_mit.txt", 'r')
     # peak_file = open("Dataset/Cyclic/list_peaks_EM_kaust.txt", 'r')
