@@ -93,6 +93,8 @@ gmm_dictionary = gmm_dict[0]
 print("Created plots and saved them!")
 print("Start representing the molecules!")
 representations, bad = represent(molecules, gmm_dictionary)
+molecules = np.delete(molecules, bad)
+outputs = np.delete(outputs, bad)
 print("Finished representing the molecules")
 
 with open(str(save_folder + "/representations.pickle"), "wb") as f:
