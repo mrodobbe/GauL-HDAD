@@ -115,6 +115,8 @@ def molecule(line):
 def input_type(line):
     if line.__contains__("InChI"):
         return True
+    elif line.__contains__(".mol"):
+        return False
     elif ":" in line:
         return False
     else:
