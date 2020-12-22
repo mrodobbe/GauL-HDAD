@@ -95,6 +95,8 @@ def molecule(line):
     """
     if line.__contains__("InChI"):  # Molecule in InChI format
         return Chem.MolFromInchi(line)
+    elif line.endswith(".mol"):
+        return rdmolfiles.MolFromMolFile(line, removeHs=False)
     elif ":" in line:  # Molecule as parsed.mol file
         if line.endswith(".xyz"):
             mol_file = str(line[:-8] + "/parsed.mol")
