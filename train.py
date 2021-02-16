@@ -2,7 +2,7 @@ from src.representation import represent
 import numpy as np
 import pickle
 import sys
-from src.makeMolecule import molecule_list, normalize, heavy_atoms, input_checker
+from src.makeMolecule import molecule_list, normalize, heavy_atoms, input_checker, store_bad_molecules
 from src.crossValidation import run_cv
 from src.gaussian import gmm
 import time
@@ -19,17 +19,9 @@ target_property = str(sys.argv[2])
 save_folder = sys.argv[3]
 
 molecules, outputs, conformers, bad_molecules = molecule_list(molecule_file)
+store_bad_molecules(bad_molecules, save_folder)
 
-if property != "cp":
-    # TODO: Making a plot takes too long!
-    print("Making a plot of the output distribution...")
-    output_plot(molecules, outputs, folder=save_folder)
-    print("Created an output plot!")
-if len(bad_molecules) > 0:
-    np.savetxt(str(save_folder + "/bad_molecules.txt"), bad_molecules, fmt="%s")
-    print("Dumped a list with molecules which could not be parsed in Output/bad_molecules.txt")
-else:
-    print("All molecules can be parsed by RDKit")
+output_plot(molecules, outputs, target_property, folder=save_folder)
 
 gmm_dict = gmm(molecules, save_folder)
 print("Successfully finished clustering all geometry features!")

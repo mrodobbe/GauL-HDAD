@@ -111,6 +111,14 @@ def molecule_list(molecule_file, suppress="no"):
     return molecules, outputs, conformers, bad_molecules
 
 
+def store_bad_molecules(bad_molecules, save_folder):
+    if len(bad_molecules) > 0:
+        np.savetxt(str(save_folder + "/bad_molecules.txt"), bad_molecules, fmt="%s")
+        print("Dumped a list with molecules which could not be parsed in Output/bad_molecules.txt")
+    else:
+        print("All molecules can be parsed by RDKit")
+
+
 def molecule(line):
     """
     This functions returns an RDKit molecule object.

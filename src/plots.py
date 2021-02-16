@@ -134,19 +134,18 @@ def gmm_plot(histogram_values, gmm_values, title=None, c_curve='#0f4c81', c_peak
             plt.show()
 
 
-def output_plot(molecules, outputs, name="output_plot", cp_column=0, folder="newPredictions"):
-    # if len(outputs.shape) > 1 or "cp" in name:
-    #     y_label = 'CBS-QB3 Heat Capacity [J mol$^{-1}$ K$^{-1}$]'
-    #     if len(outputs.shape) > 1:
-    #         if cp_column < 46:
-    #             outputs = outputs[:, cp_column]
-    #         else:
-    #             outputs = outputs[:, 0]
-    # elif min(outputs) < 0:
-    #     y_label = 'CBS-QB3 Enthalpy [kJ mol$^{-1}$]'
-    # else:
-    #     y_label = 'CBS-QB3 Entropy [J mol$^{-1}$ K$^{-1}$]'
-    y_label = 'CBS-QB3 Heat Capacity [J mol$^{-1}$ K$^{-1}$]'
+def output_plot(molecules, outputs, prop, name="output_plot", folder="newPredictions"):
+    if prop == "h":
+        y_label = "Ab Initio Enthalpy [kJ mol$^{-1}$]"
+    elif prop == "s":
+        y_label = "Ab Initio Entropy [J mol$^{-1}$ K$^{-1}$]"
+    elif prop == "cp":
+        y_label = "Ab Initio Heat Capacity (298.15 K) [J mol$^{-1}$ K$^{-1}$]"
+        outputs = outputs[:, 0]
+    else:
+        y_label = "Experimental Value"
+        if len(outputs.shape) > 1:
+            outputs = outputs[:, 0]
     ha = []
     for mol in molecules:
         ha.append(heavy_atoms(mol))
@@ -171,6 +170,7 @@ def output_plot(molecules, outputs, name="output_plot", cp_column=0, folder="new
     plt.scatter(ha, outputs, s=6, c='#0F4C81', alpha=0.1)
     location = str(folder + "/" + name + ".png")
     plt.savefig(location, format="png", bbox_inches='tight')
+    print("A plot of the output distribution is stored in {}".format(location))
     # plt.show()
 
 
