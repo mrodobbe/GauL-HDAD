@@ -77,3 +77,23 @@ def represent(molecules, conformers, gmm_dict, save_folder):
         pickle.dump(representations, f)
     print("Dumped the molecule representations!")
     return stacked_representations, bad
+
+
+def load_representations(molecules, conformers, save_folder):
+    try:
+        with open(str(save_folder + "/test_representations.pickle"), "rb") as f:
+            representations = pickle.load(f)
+        print("Loaded the molecule representations!")
+        return representations, molecules
+    except FileNotFoundError:
+        print("No representations available! Trying to find a gmm dictionary")
+        try:
+            with open(str(save_folder + "/gmm_dictionary.pickle"), "rb") as f:
+                gmm_dictionary = pickle.load(f)
+            print("Loaded the GMM data!")
+            representations, bad = represent(molecules, conformers, gmm_dictionary, save_folder)
+            molecules = np.delete(molecules, bad)
+            return representations, molecules
+        except FileNotFoundError:
+            print("No gmm dictionary found. Please include a gmm dictionary in {}".format(save_folder))
+            raise

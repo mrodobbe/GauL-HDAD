@@ -11,7 +11,7 @@ from joblib import Parallel, delayed, cpu_count
 
 start = time.time()
 
-input_checker(sys.argv)
+input_checker(sys.argv, "train")
 
 molecule_file = sys.argv[1]
 target_property = str(sys.argv[2])

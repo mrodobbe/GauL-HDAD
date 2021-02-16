@@ -13,43 +13,38 @@ def molecule_test_list(molecule_file):
     Similar to molecule_list, without outputs provided.
     """
 
-    with open(molecule_file, 'r') as f:
-        molecules_full = f.readlines()
+    try:
+        with open(molecule_file, 'r') as f:
+            molecules_full = f.readlines()
+    except FileNotFoundError:
+        print("The input file does not exist.")
+        raise
 
-    molecules = []  # Create empty lists
-    outputs = []
+    molecules = []
+    conformers = []
+    bad_molecules = []
 
     for line in molecules_full:
-        line = line[:-1].split('\t')
-        molecules.append(line[0])
-        if len(line) > 2:
-            outputs.append(np.asarray(line[1:]).astype(np.float))
-        else:
-            if len(line) == 1 and len(line[0].split(' ')) > 1:
-                line = line[0].split(' ')
-                outputs.append(line[1:])
-            else:
-                outputs.append(line[1])
+        line = line[:-1]
+        try:
+            c = conformer(line)
+            conformers.append(c)
+        except ValueError:
+            print("{} is a bad molecule!".format(line[0]))
+            bad_molecules.append(line[0])
+            continue
 
-    outputs = np.asarray(outputs).astype(np.float)
+        # TODO: Instead of removing the molecule, a method must be created to figure out the coordinates of the molecule
 
-    return molecules, outputs
+        # print(line[0])
+        molecules.append(line)
 
-    # with open(molecule_file, 'r') as f:
-    #     molecules_full = f.readlines()
-    #
-    # molecules = []
-    #
-    # for line in molecules_full:
-    #     line = line[:-1]
-    #     molecules.append(line)
-    #
-    # if len(molecules) == 1:
-    #     print("{} contains {} molecule".format(str(molecule_file), len(molecules)))
-    # else:
-    #     print("{} contains {} molecules".format(str(molecule_file), len(molecules)))
-    #
-    # return molecules
+    if len(molecules) == 1:
+        print("{} contains {} molecule".format(str(molecule_file), len(molecules)))
+    else:
+        print("{} contains {} molecules".format(str(molecule_file), len(molecules)))
+
+    return molecules, conformers, bad_molecules
 
 
 def molecule_list(molecule_file, suppress="no"):
@@ -300,25 +295,27 @@ def add_n(molecules, representations):
     return new_representations
 
 
-def input_checker(args):
+def input_checker(args, filename):
     if len(args) < 4:
         print("Not enough input files.\nPlease use the following command structure:\n"
-              "python train.py <molecule_file> <property> <save_folder>")
+              "python {}.py <molecule_file> <property> <save_folder>".format(filename))
         raise IndexError
     else:
-        folder = args[3]
-        try:
-            os.mkdir(folder)
-        except PermissionError:
-            print("No permission to create folder.\nThere are two ways to solve the problem:\n"
-                  "1) Open Anaconda as Administrator\n"
-                  "2) Manually create the subdirectory Output with 2 additional subdirectories in Output: gmm and hist")
-            raise
-        except FileExistsError:
-            print("Folder already exists. Data in this folder will be overwritten.")
+        if filename == "train":
+            folder = args[3]
+            try:
+                os.mkdir(folder)
+            except PermissionError:
+                print("No permission to create folder.\nThere are two ways to solve the problem:\n"
+                      "1) Open Anaconda as Administrator\n"
+                      "2) Manually create the subdirectory Output with 2 additional "
+                      "subdirectories in Output: gmm and hist")
+                raise
+            except FileExistsError:
+                print("Folder already exists. Data in this folder will be overwritten.")
 
-        try:
-            os.mkdir(str(folder + "/gmm"))
-            os.mkdir(str(folder + "/hist"))
-        except FileExistsError:
-            print("Folders already exist.")
+            try:
+                os.mkdir(str(folder + "/gmm"))
+                os.mkdir(str(folder + "/hist"))
+            except FileExistsError:
+                print("Folders already exist.")
