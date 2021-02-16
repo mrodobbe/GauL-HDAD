@@ -4,6 +4,7 @@ from rdkit.Chem.rdMolTransforms import ComputePrincipalAxesAndMoments as Inertia
 from rdkit.Chem.Descriptors import NumRadicalElectrons
 import numpy as np
 import math
+import os
 
 
 def molecule_test_list(molecule_file):
@@ -289,3 +290,27 @@ def add_n(molecules, representations):
         t_r.append(t)
     new_representations = np.stack(t_r)
     return new_representations
+
+
+def input_checker(args):
+    if len(args) < 4:
+        print("Not enough input files.\nPlease use the following command structure:\n"
+              "python train.py <molecule_file> <property> <save_folder>")
+        raise IndexError
+    else:
+        folder = args[3]
+        try:
+            os.mkdir(folder)
+        except PermissionError:
+            print("No permission to create folder.\nThere are two ways to solve the problem:\n"
+                  "1) Open Anaconda as Administrator\n"
+                  "2) Manually create the subdirectory Output with 2 additional subdirectories in Output: gmm and hist")
+            raise
+        except FileExistsError:
+            print("Folder already exists. Data in this folder will be overwritten.")
+
+        try:
+            os.mkdir(str(folder + "/gmm"))
+            os.mkdir(str(folder + "/hist"))
+        except FileExistsError:
+            print("Folders already exist.")

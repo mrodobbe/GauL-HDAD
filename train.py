@@ -2,43 +2,21 @@ from src.representation import represent
 import numpy as np
 import pickle
 import sys
-from src.makeMolecule import molecule_list, normalize, heavy_atoms
+from src.makeMolecule import molecule_list, normalize, heavy_atoms, input_checker
 from src.crossValidation import run_cv
 from src.gaussian import gmm
 import time
-import os
 from src.plots import histogram_plots, gmm_plot, output_plot
 from sklearn.model_selection import KFold
 from joblib import Parallel, delayed, cpu_count
 
 start = time.time()
 
-# TODO: Add argument for user-defined output folder
+input_checker(sys.argv)
 save_folder = sys.argv[3]
-# save_folder = "./Output"
-try:
-    os.mkdir(save_folder)
-except PermissionError:
-    print("No permission to create folder.\nThere are two ways to solve the problem:\n"
-          "1) Open Anaconda as Administrator\n"
-          "2) Manually create the subdirectory Output with 2 additional subdirectories in Output: gmm and hist")
-    raise
-except FileExistsError:
-    print("Folder already exists.")
 
-try:
-    os.mkdir(str(save_folder + "/gmm"))
-    os.mkdir(str(save_folder + "/hist"))
-except FileExistsError:
-    print("Folders already exist.")
-
-try:
-    molecule_file = sys.argv[1]
-    target_property = str(sys.argv[2])
-except IndexError:
-    print("Not enough input files.\nPlease use the following command structure:\n"
-          "python train.py <molecule_file> <property>")
-    raise
+molecule_file = sys.argv[1]
+target_property = str(sys.argv[2])
 
 try:
     molecules, outputs, bad_molecules = molecule_list(molecule_file)
