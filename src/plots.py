@@ -135,17 +135,18 @@ def gmm_plot(histogram_values, gmm_values, title=None, c_curve='#0f4c81', c_peak
 
 
 def output_plot(molecules, outputs, name="output_plot", cp_column=0, folder="newPredictions"):
-    if len(outputs.shape) > 1 or "cp" in name:
-        y_label = 'CBS-QB3 Heat Capacity [J mol$^{-1}$ K$^{-1}$]'
-        if len(outputs.shape) > 1:
-            if cp_column < 46:
-                outputs = outputs[:, cp_column]
-            else:
-                outputs = outputs[:, 0]
-    elif min(outputs) < 0:
-        y_label = 'CBS-QB3 Enthalpy [kJ mol$^{-1}$]'
-    else:
-        y_label = 'CBS-QB3 Entropy [J mol$^{-1}$ K$^{-1}$]'
+    # if len(outputs.shape) > 1 or "cp" in name:
+    #     y_label = 'CBS-QB3 Heat Capacity [J mol$^{-1}$ K$^{-1}$]'
+    #     if len(outputs.shape) > 1:
+    #         if cp_column < 46:
+    #             outputs = outputs[:, cp_column]
+    #         else:
+    #             outputs = outputs[:, 0]
+    # elif min(outputs) < 0:
+    #     y_label = 'CBS-QB3 Enthalpy [kJ mol$^{-1}$]'
+    # else:
+    #     y_label = 'CBS-QB3 Entropy [J mol$^{-1}$ K$^{-1}$]'
+    y_label = 'CBS-QB3 Heat Capacity [J mol$^{-1}$ K$^{-1}$]'
     ha = []
     for mol in molecules:
         ha.append(heavy_atoms(mol))

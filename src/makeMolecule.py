@@ -15,18 +15,40 @@ def molecule_test_list(molecule_file):
     with open(molecule_file, 'r') as f:
         molecules_full = f.readlines()
 
-    molecules = []
+    molecules = []  # Create empty lists
+    outputs = []
 
     for line in molecules_full:
-        line = line[:-1]
-        molecules.append(line)
+        line = line[:-1].split('\t')
+        molecules.append(line[0])
+        if len(line) > 2:
+            outputs.append(np.asarray(line[1:]).astype(np.float))
+        else:
+            if len(line) == 1 and len(line[0].split(' ')) > 1:
+                line = line[0].split(' ')
+                outputs.append(line[1:])
+            else:
+                outputs.append(line[1])
 
-    if len(molecules) == 1:
-        print("{} contains {} molecule".format(str(molecule_file), len(molecules)))
-    else:
-        print("{} contains {} molecules".format(str(molecule_file), len(molecules)))
+    outputs = np.asarray(outputs).astype(np.float)
 
-    return molecules
+    return molecules, outputs
+
+    # with open(molecule_file, 'r') as f:
+    #     molecules_full = f.readlines()
+    #
+    # molecules = []
+    #
+    # for line in molecules_full:
+    #     line = line[:-1]
+    #     molecules.append(line)
+    #
+    # if len(molecules) == 1:
+    #     print("{} contains {} molecule".format(str(molecule_file), len(molecules)))
+    # else:
+    #     print("{} contains {} molecules".format(str(molecule_file), len(molecules)))
+    #
+    # return molecules
 
 
 def molecule_list(molecule_file, suppress="no"):
@@ -166,7 +188,7 @@ def normalize(molecules, outputs, thermo, coefficient=None):
     for mol, output in zip(molecules, outputs):
         ha = heavy_atoms(mol)
         heavy.append(ha)
-        normed = output / (math.log10(ha) ** coefficient)
+        normed = output / (math.log(ha) ** coefficient)
         normalized_output.append(normed)
     normalized_output = np.asarray(normalized_output).astype(np.float)
     heavy = np.asarray(heavy)
@@ -183,7 +205,7 @@ def denormalize(outputs, heavy, thermo, coefficient=None):
         coefficient = float(coefficient)
     original = []
     for s, n in zip(outputs, heavy):
-        original.append(s * (math.log10(n)) ** coefficient)
+        original.append(s * (math.log(n)) ** coefficient)
     original = np.asarray(original).astype(np.float)
     return original
 

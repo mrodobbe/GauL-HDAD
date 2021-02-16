@@ -34,7 +34,7 @@ except FileNotFoundError:
     print("The input file does not exist.")
     raise
 try:
-    with open(str(save_folder + "/representations.pickle"), "rb") as f:
+    with open(str(save_folder + "/test_representations.pickle"), "rb") as f:
         representations = pickle.load(f)
     print("Loaded the molecule representations!")
 except FileNotFoundError:
@@ -66,25 +66,35 @@ for model in models:
         ensemble = np.vstack((ensemble, test_predicted))
 
 ensemble_prediction = np.mean(ensemble, axis=0)
+ensemble_sd = np.std(ensemble, axis=0)
 ensemble_error = np.abs(ensemble_prediction - y_test)
-columns = len(ensemble[0, :])
+columns = 10
 individual_mae = []
 individual_rmse = []
 for i in range(columns):
-    err = np.abs(y_test - ensemble[:, i])
+    err = np.abs(y_test - ensemble[i, :])
     individual_mae.append(np.average(err))
-    individual_rmse.append(np.average(err ** 2))
+    individual_rmse.append(np.sqrt(np.average(err ** 2)))
 
 ensemble_mae = np.average(ensemble_error)
 ensemble_rmse = np.sqrt(np.average(ensemble_error ** 2))
+ensemble_sd_mae = np.std(individual_mae)
+ensemble_sd_rmse = np.std(individual_rmse)
 
 save_name = "/test_results_{}.txt".format(len(y_test))
 
 with open(str(save_folder + save_name), "w") as f:
     f.write('ANN Ensemble Test performance statistics:\n')
-    f.write('Mean absolute error:\t\t{:.2f} kJ/mol\n'.format(ensemble_mae))
-    f.write('Root mean squared error:\t{:.2f} kJ/mol\n\n'.format(ensemble_rmse))
+    f.write('Mean absolute error:\t\t{:.2f} +/- {:.2f} kJ/mol\n'.format(ensemble_mae, ensemble_sd_mae))
+    f.write('Root mean squared error:\t{:.2f} +/- {:.2f} kJ/mol\n\n'.format(ensemble_rmse, ensemble_sd_rmse))
     for i, mae_value, rmse_value in zip(range(len(individual_mae)), individual_mae, individual_rmse):
         f.write('Fold {} - MAE: {} kJ/mol\t\t-\t\tRMSE: {} kJ/mol\n'.format(i + 1, mae_value, rmse_value))
+    f.close()
+
+with open(str(save_folder + "/test_predictions.txt"), "w") as f:
+    f.write(str("Molecule \t Real Value \t Prediction \t Deviation \t Error \n"))
+    for m, v, p, s, e in zip(molecules, y_test, ensemble_prediction, ensemble_sd, ensemble_error):
+        f.write(str(m) + '\t' + str(round(v, 4)) + '\t' + str(round(p, 4)) + '\t' + str(round(s, 4)) +
+                '\t' + str(round(e, 4)) + '\n')
     f.close()
 
