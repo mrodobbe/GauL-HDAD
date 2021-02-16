@@ -1,8 +1,7 @@
 from src.representation import represent
 import numpy as np
-import pickle
 import sys
-from src.makeMolecule import molecule_list, normalize, heavy_atoms, input_checker, store_bad_molecules
+from src.makeMolecule import molecule_list, normalize, input_checker, store_bad_molecules
 from src.crossValidation import run_cv
 from src.gaussian import gmm
 import time
@@ -24,7 +23,7 @@ output_plot(molecules, outputs, target_property, folder=save_folder)
 
 gmm_dictionary = gmm(molecules, conformers, save_folder)
 
-representations, bad = represent(molecules, conformers, gmm_dictionary)
+representations, bad = represent(molecules, conformers, gmm_dictionary, save_folder)
 molecules = np.delete(molecules, bad)
 outputs = np.delete(outputs, bad)
 
