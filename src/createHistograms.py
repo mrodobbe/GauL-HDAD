@@ -5,39 +5,16 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 
-def all_values(data):
+def all_values(data, conformers):
     hist_input = {}
     bad = []
-    for mol in data:
+    for mol, conformer_tuple in zip(data, conformers):
         print(mol)
-        if input_type(mol):
-            try:
-                conf, n, mol_h = conformer(mol)
-                # TODO: More efficient way
-            except ValueError:
-                try:
-                    conf, n, mol_h = conformer(mol)
-                except ValueError:
-                    m = molecule(mol)
-                    mol_h = Chem.AddHs(m)
-                    try:
-                        AllChem.EmbedMolecule(mol_h, useRandomCoords=True)
-                        AllChem.UFFOptimizeMolecule(mol_h)
-                        conf, n, mol_h = mol_h.GetConformer(), mol_h.GetNumAtoms(), mol_h
-                    except ValueError:
-                        print("{} is a bad molecule".format(mol))
-                        bad.append(list(data).index(mol))
-                        continue
-            dist = bonds(conf, n, mol_h)
-            angs = angles(conf, n, mol_h)
-            dihs = dihedrals(conf, n, mol_h)
-            geo = (dist[0] + angs[0] + dihs[0], dist[1] + angs[1] + dihs[1])
-        else:
-            conf, n, mol_h = conformer(mol)
-            dist = bonds(conf, n, mol_h)
-            angs = angles(conf, n, mol_h)
-            dihs = dihedrals(conf, n, mol_h)
-            geo = (dist[0] + angs[0] + dihs[0], dist[1] + angs[1] + dihs[1])
+        conf, n, mol_h = conformer_tuple
+        dist = bonds(conf, n, mol_h)
+        angs = angles(conf, n, mol_h)
+        dihs = dihedrals(conf, n, mol_h)
+        geo = (dist[0] + angs[0] + dihs[0], dist[1] + angs[1] + dihs[1])
         for value, name in zip(*geo):
             # print(value, name)
             if name in hist_input:

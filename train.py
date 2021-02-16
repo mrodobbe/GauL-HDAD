@@ -20,10 +20,9 @@ save_folder = sys.argv[3]
 
 molecules, outputs, conformers, bad_molecules = molecule_list(molecule_file)
 store_bad_molecules(bad_molecules, save_folder)
-
 output_plot(molecules, outputs, target_property, folder=save_folder)
 
-gmm_dict = gmm(molecules, save_folder)
+gmm_dict = gmm(molecules, conformers, save_folder)
 print("Successfully finished clustering all geometry features!")
 # TODO: Bad molecules must be popped from lists
 # TODO: Put these lines somewhere in the background

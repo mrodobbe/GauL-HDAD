@@ -85,9 +85,9 @@ def gaussian_mixture_model(geometry_type, values):
     return theta_opt, LL
 
 
-def gmm(data, save_folder):
+def gmm(data, conformers, save_folder):
     print("Start calculating all geometry features.")
-    geometry_dict, bad = all_values(data)
+    geometry_dict, bad = all_values(data, conformers)
     store_histograms(geometry_dict, save_folder)
     for key in geometry_dict:
         print(key)
