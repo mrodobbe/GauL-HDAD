@@ -56,28 +56,27 @@ def molecule_list(molecule_file, suppress="no"):
     """
     This function turns the input file into a list of identifiers.
     """
-
-    with open(molecule_file, 'r') as f:
-        molecules_full = f.readlines()
+    try:
+        with open(molecule_file, 'r') as f:
+            molecules_full = f.readlines()
+    except FileNotFoundError:
+        print("The input file does not exist.")
+        raise
 
     molecules = []  # Create empty lists
     outputs = []
+    conformers = []
     bad_molecules = []
 
     for line in molecules_full:
         line = line[:-1].split('\t')
-        # Check if the molecule can be handled by RDKit
-        # TODO: The parsing step takes too much time ==> Optimize!
-        if input_type(line):
-            try:
-                conformer(line[0])
-            except ValueError:
-                try:
-                    conformer(line[0])
-                except ValueError:
-                    print("{} is a bad molecule!".format(line[0]))
-                    bad_molecules.append(line[0])
-                    continue
+        try:
+            c = conformer(line[0])
+            conformers.append(c)
+        except ValueError:
+            print("{} is a bad molecule!".format(line[0]))
+            bad_molecules.append(line[0])
+            continue
 
         # TODO: Instead of removing the molecule, a method must be created to figure out the coordinates of the molecule
 
@@ -109,7 +108,7 @@ def molecule_list(molecule_file, suppress="no"):
         else:
             print("{} contains {} molecules".format(str(molecule_file), len(molecules)))
 
-    return molecules, outputs, bad_molecules
+    return molecules, outputs, conformers, bad_molecules
 
 
 def molecule(line):
@@ -165,10 +164,7 @@ def conformer(mol_name):
         try:
             AllChem.MMFFOptimizeMolecule(mol_h, maxIters=10000)
         except ValueError:
-            try:
-                AllChem.UFFOptimizeMolecule(mol_h, maxIters=10000)
-            except ValueError:
-                pass
+            pass
         return mol_h.GetConformer(), mol_h.GetNumAtoms(), mol_h
 
 

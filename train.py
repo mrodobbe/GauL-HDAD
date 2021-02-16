@@ -13,16 +13,12 @@ from joblib import Parallel, delayed, cpu_count
 start = time.time()
 
 input_checker(sys.argv)
-save_folder = sys.argv[3]
 
 molecule_file = sys.argv[1]
 target_property = str(sys.argv[2])
+save_folder = sys.argv[3]
 
-try:
-    molecules, outputs, bad_molecules = molecule_list(molecule_file)
-except FileNotFoundError:
-    print("The input file does not exist.")
-    raise
+molecules, outputs, conformers, bad_molecules = molecule_list(molecule_file)
 
 if property != "cp":
     # TODO: Making a plot takes too long!
