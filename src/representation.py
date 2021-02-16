@@ -1,7 +1,8 @@
 import numpy as np
+import pickle
 from src.geometryFeatures import bonds, angles, dihedrals
 from src.gaussian import gauss
-from src.makeMolecule import conformer, input_type, add_radical
+from src.makeMolecule import add_radical
 
 
 def gaul_representation(mol, conformer_tuple, theta_dict):
@@ -55,7 +56,7 @@ def gaul_representation(mol, conformer_tuple, theta_dict):
     return r
 
 
-def represent(molecules, conformers, gmm_dict):
+def represent(molecules, conformers, gmm_dict, save_folder):
     representations = []
     bad = []
     molecules = list(molecules)
@@ -72,4 +73,7 @@ def represent(molecules, conformers, gmm_dict):
     stacked_representations = np.stack(representations)
     stacked_representations = add_radical(molecules, stacked_representations)
     print("Finished representing the molecules")
+    with open(str(save_folder + "/representations.pickle"), "wb") as f:
+        pickle.dump(representations, f)
+    print("Dumped the molecule representations!")
     return stacked_representations, bad

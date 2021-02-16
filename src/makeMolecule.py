@@ -183,18 +183,22 @@ def heavy_atoms(mol):
 
 
 def normalize(molecules, outputs, thermo, coefficient=None):
-    property_dict = {"entropy": 1,
-                     "s": 1,
+    property_dict = {"entropy": 1.5,
+                     "s": 1.5,
                      "cp": 1.5}
     if coefficient is None:
         coefficient = property_dict[thermo]
-    normalized_output = []
-    heavy = []
-    for mol, output in zip(molecules, outputs):
-        ha = heavy_atoms(mol)
-        heavy.append(ha)
-        normed = output / (math.log(ha) ** coefficient)
-        normalized_output.append(normed)
+    if thermo in property_dict:
+        normalized_output = []
+        heavy = []
+        for mol, output in zip(molecules, outputs):
+            ha = heavy_atoms(mol)
+            heavy.append(ha)
+            normed = output / (math.log(ha) ** coefficient)
+            normalized_output.append(normed)
+    else:
+        heavy = [heavy_atoms(mol, output) for mol, output in zip(molecules, outputs)]
+        normalized_output = outputs
     normalized_output = np.asarray(normalized_output).astype(np.float)
     heavy = np.asarray(heavy)
     return normalized_output, heavy

@@ -28,14 +28,7 @@ representations, bad = represent(molecules, conformers, gmm_dictionary)
 molecules = np.delete(molecules, bad)
 outputs = np.delete(outputs, bad)
 
-with open(str(save_folder + "/representations.pickle"), "wb") as f:
-    pickle.dump(representations, f)
-print("Dumped the molecule representations!")
-
-if target_property != "h":
-    outputs, heavy_atoms = normalize(molecules, outputs, "s", coefficient=1.5)
-else:
-    heavy_atoms = np.asarray([heavy_atoms(mol) for mol in molecules])
+outputs, heavy_atoms = normalize(molecules, outputs, target_property)
 
 n_folds = 10  # TODO: Make argument
 kf = KFold(n_folds, shuffle=True, random_state=12081997)
