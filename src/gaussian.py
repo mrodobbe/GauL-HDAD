@@ -3,6 +3,7 @@ from src.plots import store_histograms, store_gaussians
 import math
 import numpy as np
 from joblib import Parallel, cpu_count, delayed
+import pickle
 
 
 def run_gmm(key, geometry_dict):
@@ -87,7 +88,7 @@ def gaussian_mixture_model(geometry_type, values):
 
 def gmm(data, conformers, save_folder):
     print("Start calculating all geometry features.")
-    geometry_dict, bad = all_values(data, conformers)
+    geometry_dict = all_values(data, conformers)
     store_histograms(geometry_dict, save_folder)
     for key in geometry_dict:
         print(key)
@@ -99,7 +100,19 @@ def gmm(data, conformers, save_folder):
         gmm_dict[key] = gmm_info[i][0]
         ll_dict[key] = gmm_info[i][1]
     store_gaussians(geometry_dict, gmm_dict, save_folder)
-    return gmm_dict, ll_dict, geometry_dict, bad
+    print("Successfully finished clustering all geometry features!")
+
+    with open(str(save_folder + "/gmm_dictionary.pickle"), "wb") as f:
+        pickle.dump(gmm_dict, f)
+    print("Dumped the GMM data in the {} folder!".format(save_folder))
+    with open(str(save_folder + "/ll_dictionary.pickle"), "wb") as f:
+        pickle.dump(ll_dict, f)
+    print("Dumped the log-likelihood data in the {} folder!".format(save_folder))
+    with open(str(save_folder + "/histogram_dictionary.pickle"), "wb") as f:
+        pickle.dump(geometry_dict, f)
+    print("Dumped the histograms in the {} folder!".format(save_folder))
+
+    return gmm_dict
 
 
 def peak_filtering(geometry_dict, decimals=3):

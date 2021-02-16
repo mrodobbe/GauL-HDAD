@@ -7,7 +7,6 @@ from rdkit.Chem import AllChem
 
 def all_values(data, conformers):
     hist_input = {}
-    bad = []
     for mol, conformer_tuple in zip(data, conformers):
         print(mol)
         conf, n, mol_h = conformer_tuple
@@ -21,7 +20,7 @@ def all_values(data, conformers):
                 hist_input[name].append(value)
             else:
                 hist_input[name] = [value]
-    return hist_input, bad
+    return hist_input
 
 
 def histogram_plot(data, geometry_type):

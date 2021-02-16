@@ -22,37 +22,7 @@ molecules, outputs, conformers, bad_molecules = molecule_list(molecule_file)
 store_bad_molecules(bad_molecules, save_folder)
 output_plot(molecules, outputs, target_property, folder=save_folder)
 
-gmm_dict = gmm(molecules, conformers, save_folder)
-print("Successfully finished clustering all geometry features!")
-# TODO: Bad molecules must be popped from lists
-# TODO: Put these lines somewhere in the background
-
-with open(str(save_folder + "/gmm_dictionary.pickle"), "wb") as f:
-    pickle.dump(gmm_dict[0], f)
-print("Dumped the GMM data!")
-with open(str(save_folder + "/ll_dictionary.pickle"), "wb") as f:
-    pickle.dump(gmm_dict[1], f)
-print("Dumped the log-likelihood data!")
-with open(str(save_folder + "/histogram_dictionary.pickle"), "wb") as f:
-    pickle.dump(gmm_dict[2], f)
-print("Dumped the histograms!")
-
-histogram_dict = gmm_dict[2]
-gmm_dictionary = gmm_dict[0]
-
-# TODO: Make function for plotting
-
-# for key in histogram_dict:
-#     v = histogram_dict[key]
-#     t = gmm_dictionary[key]
-#     if len(key) == 2:
-#         metric = "Distance"
-#         unit = "Å"
-#     else:
-#         metric = "Angle"
-#         unit = "rad"
-#     gmm_plot(v, t, title=key, folder=str(save_folder + "/gmm"), metric=metric, unit=unit)
-#     histogram_plots(v, title=key, folder=str(save_folder + "/hist"), metric=metric, unit=unit)
+gmm_dictionary = gmm(molecules, conformers, save_folder)
 
 # TODO: Pop bad molecules
 print("Created plots and saved them!")
