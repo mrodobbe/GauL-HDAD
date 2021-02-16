@@ -89,18 +89,22 @@ def gaussian_mixture_model(geometry_type, values):
 def gmm(data, conformers, save_folder):
     print("Start calculating all geometry features.")
     geometry_dict = all_values(data, conformers)
+    print("Finished calculating all geometry features.")
     store_histograms(geometry_dict, save_folder)
+    print("Created histograms and saved them!")
     for key in geometry_dict:
         print(key)
     ll_dict = {}
     gmm_dict = {}
     n_jobs = cpu_count() - 5
+    print("Started clustering all geometry features!")
     gmm_info = Parallel(n_jobs=n_jobs)(delayed(run_gmm)(keg, geometry_dict) for keg in geometry_dict)
     for key, i in zip(geometry_dict, range(len(geometry_dict))):
         gmm_dict[key] = gmm_info[i][0]
         ll_dict[key] = gmm_info[i][1]
-    store_gaussians(geometry_dict, gmm_dict, save_folder)
     print("Successfully finished clustering all geometry features!")
+    store_gaussians(geometry_dict, gmm_dict, save_folder)
+    print("Created GMM plots and saved them!")
 
     with open(str(save_folder + "/gmm_dictionary.pickle"), "wb") as f:
         pickle.dump(gmm_dict, f)

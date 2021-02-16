@@ -6,7 +6,7 @@ from src.makeMolecule import molecule_list, normalize, heavy_atoms, input_checke
 from src.crossValidation import run_cv
 from src.gaussian import gmm
 import time
-from src.plots import histogram_plots, gmm_plot, output_plot
+from src.plots import output_plot
 from sklearn.model_selection import KFold
 from joblib import Parallel, delayed, cpu_count
 
@@ -24,13 +24,9 @@ output_plot(molecules, outputs, target_property, folder=save_folder)
 
 gmm_dictionary = gmm(molecules, conformers, save_folder)
 
-# TODO: Pop bad molecules
-print("Created plots and saved them!")
-print("Start representing the molecules!")
-representations, bad = represent(molecules, gmm_dictionary)
+representations, bad = represent(molecules, conformers, gmm_dictionary)
 molecules = np.delete(molecules, bad)
 outputs = np.delete(outputs, bad)
-print("Finished representing the molecules")
 
 with open(str(save_folder + "/representations.pickle"), "wb") as f:
     pickle.dump(representations, f)

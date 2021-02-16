@@ -4,10 +4,10 @@ from src.gaussian import gauss
 from src.makeMolecule import conformer, input_type, add_radical
 
 
-def gaul_representation(mol, theta_dict):
+def gaul_representation(mol, conformer_tuple, theta_dict):
     print(mol)
     representation_dict = {}
-    conf, n, mol_h = conformer(mol)
+    conf, n, mol_h = conformer_tuple
     dist = bonds(conf, n, mol_h)
     angs = angles(conf, n, mol_h)
     dihs = dihedrals(conf, n, mol_h)
@@ -55,13 +55,14 @@ def gaul_representation(mol, theta_dict):
     return r
 
 
-def represent(molecules, gmm_dict):
+def represent(molecules, conformers, gmm_dict):
     representations = []
     bad = []
     molecules = list(molecules)
-    for mol in molecules:
+    print("Start representing the molecules!")
+    for mol, conformer_tuple in zip(molecules, conformers):
         try:
-            v = gaul_representation(mol, gmm_dict)
+            v = gaul_representation(mol, conformer_tuple, gmm_dict)
         except ValueError:
             print("Bad molecule at index {}".format(molecules.index(mol)))
             bad.append(molecules.index(mol))
@@ -70,4 +71,5 @@ def represent(molecules, gmm_dict):
         representations.append(r)
     stacked_representations = np.stack(representations)
     stacked_representations = add_radical(molecules, stacked_representations)
+    print("Finished representing the molecules")
     return stacked_representations, bad
