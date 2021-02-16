@@ -6,7 +6,7 @@ from src.makeModel import model_builder
 from src.makeMolecule import denormalize
 from sklearn.svm import SVR
 from src.plots import performance_plot
-from joblib import wrap_non_picklable_objects
+from joblib import wrap_non_picklable_objects, Parallel, delayed, cpu_count
 from sklearn.model_selection import KFold
 
 
@@ -250,3 +250,82 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
                svr_mean_absolute_error, svr_root_mean_squared_error,
     else:
         return test_mean_absolute_error, test_root_mean_squared_error, ensemble_mae, ensemble_rmse
+
+
+def training(molecules, heavy_atoms, representations, outputs, save_folder, target_property, n_folds):
+    kf = KFold(n_folds, shuffle=True, random_state=12081997)
+
+    cpu = cpu_count()
+    # cpu = 4
+    if n_folds > cpu:
+        n_jobs = cpu
+    else:
+        n_jobs = n_folds
+
+    cv_info = Parallel(n_jobs=n_jobs)(delayed(run_cv)(molecules, heavy_atoms, representations, outputs,
+                                                      loop_kf, i, save_folder, target_property)
+                                      for loop_kf, i in zip(kf.split(representations), range(1, n_folds+1)))
+
+    return cv_info
+
+
+def write_statistics(cv_info, target_property, n_folds, time_elapsed, save_folder):
+    prediction_mae = []
+    prediction_rmse = []
+    prediction_svr_mae = []
+    prediction_svr_rmse = []
+
+    test_models = []
+    test_svr = []
+    for j in range(n_folds):
+        prediction_mae.append(cv_info[j][0])
+        prediction_rmse.append(cv_info[j][1])
+        if target_property != "cp":
+            prediction_svr_mae.append(cv_info[j][2])
+            prediction_svr_rmse.append(cv_info[j][3])
+
+    best_index = np.argmin(prediction_rmse)
+    if target_property != "cp":
+        best_index_svr = np.argmin(prediction_svr_rmse)
+        with open(str(save_folder + "/best_models.txt"), "w") as f:
+            f.write("The best ANN model is from fold {}, "
+                    "while the best SVR model is from fold {}\n".format(best_index + 1, best_index_svr + 1))
+            f.close()
+    else:
+        with open(str(save_folder + "/best_models.txt"), "w") as f:
+            f.write("The best ANN model is from fold {}.".format(best_index + 1))
+            f.close()
+
+    with open(str(save_folder + "/test_statistics.txt"), "w") as f:
+        f.write('Test performance statistics for ANN:\n')
+        f.write(
+            'Mean absolute error:\t\t{:.2f} +/- {} kJ/mol\n'.format(np.mean(prediction_mae), np.std(prediction_mae)))
+        f.write('Root mean squared error:\t{:.2f} +/- {} kJ/mol\n\n'.format(np.mean(prediction_rmse),
+                                                                            np.std(prediction_rmse)))
+        for i, mae_value, rmse_value in zip(range(len(prediction_mae)), prediction_mae, prediction_rmse):
+            f.write('Fold {} - MAE: {} kJ/mol\t\t-\t\tRMSE: {} kJ/mol\n'.format(i + 1, mae_value, rmse_value))
+        if target_property != "cp":
+            f.write('\nTest performance statistics for SVR:\n')
+            f.write('Mean absolute error:\t\t{:.2f} +/- {} kJ/mol\n'.format(np.mean(prediction_svr_mae),
+                                                                            np.std(prediction_svr_mae)))
+            f.write('Root mean squared error:\t{:.2f} +/- {} kJ/mol\n\n'.format(np.mean(prediction_svr_rmse),
+                                                                                np.std(prediction_svr_rmse)))
+            for i, mae_value, rmse_value in zip(range(len(prediction_svr_mae)), prediction_svr_mae,
+                                                prediction_svr_rmse):
+                f.write('Fold {} - MAE: {} kJ/mol\t\t-\t\tRMSE: {} kJ/mol\n'.format(i + 1, mae_value, rmse_value))
+        f.write('\nTime elapsed: {} seconds\n'.format(time_elapsed))
+        f.close()
+
+    print("Finished! This took {} ".format(seconds_to_text(time_elapsed)))
+
+
+def seconds_to_text(secs):
+    days = round(secs//86400)
+    hours = round((secs - days*86400)//3600)
+    minutes = round((secs - days*86400 - hours*3600)//60)
+    seconds = round(secs - days*86400 - hours*3600 - minutes*60)
+    result = ("{} days, ".format(days) if days else "") + \
+             ("{} hours, ".format(hours) if hours else "") + \
+             ("{} minutes, ".format(minutes) if minutes else "") + \
+             ("{} seconds ".format(seconds) if seconds else "")
+    return result
