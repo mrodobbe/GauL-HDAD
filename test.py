@@ -1,7 +1,7 @@
 from src.representation import load_representations
 import numpy as np
 import sys
-from src.makeMolecule import molecule_test_list, input_checker, store_bad_molecules
+from src.makeMolecule import molecule_test_list, input_checker, store_bad_molecules, denormalize, heavy_atoms
 import time
 from tensorflow.keras.models import load_model
 
@@ -16,7 +16,9 @@ save_folder = sys.argv[3]
 molecules, conformers, bad_molecules = molecule_test_list(molecule_file)
 store_bad_molecules(bad_molecules, save_folder)
 representations, molecules = load_representations(molecules, conformers, save_folder)
+heavy = [heavy_atoms(mol) for mol in molecules]
 
+# TODO: detect number of folds
 folders = ['Fold 1', 'Fold 2', 'Fold 3', 'Fold 4', 'Fold 5', 'Fold 6', 'Fold 7', 'Fold 8', 'Fold 9', 'Fold 10']
 models = [load_model(str(save_folder + '/' + folder)) for folder in folders]
 
@@ -26,6 +28,7 @@ ensemble = np.array([])
 for model in models:
     test_predicted = model.predict(x_test).reshape(-1)
     test_predicted = np.asarray(test_predicted).astype(np.float)
+    test_predicted = denormalize(test_predicted, heavy, target_property)
     if len(ensemble) == 0:
         ensemble = test_predicted
     else:
