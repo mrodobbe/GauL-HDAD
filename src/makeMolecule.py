@@ -183,7 +183,9 @@ def normalize(molecules, outputs, thermo, coefficient=None):
                      "cp": 1.5}
     if coefficient is None and thermo in property_dict:
         coefficient = property_dict[thermo]
-    if thermo in property_dict:
+    elif coefficient is not None:
+        coefficient = float(coefficient)
+    if thermo in property_dict or coefficient is not None:
         normalized_output = []
         heavy = []
         for mol, output in zip(molecules, outputs):
@@ -200,17 +202,20 @@ def normalize(molecules, outputs, thermo, coefficient=None):
 
 
 def denormalize(outputs, heavy, thermo, coefficient=None):
-    property_dict = {"entropy": 1,
-                     "s": 1,
+    property_dict = {"entropy": 1.5,
+                     "s": 1.5,
                      "cp": 1.5}
-    if coefficient is None:
+    if coefficient is None and thermo in property_dict:
         coefficient = property_dict[thermo]
-    else:
+    elif coefficient is not None:
         coefficient = float(coefficient)
-    original = []
-    for s, n in zip(outputs, heavy):
-        original.append(s * (math.log(n)) ** coefficient)
-    original = np.asarray(original).astype(np.float)
+    if thermo in property_dict or coefficient is not None:
+        original = []
+        for s, n in zip(outputs, heavy):
+            original.append(s * (math.log(n)) ** coefficient)
+        original = np.asarray(original).astype(np.float)
+    else:
+        original = outputs
     return original
 
 
