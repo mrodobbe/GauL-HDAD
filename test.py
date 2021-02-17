@@ -2,6 +2,7 @@ from src.representation import load_representations
 import numpy as np
 import sys
 from src.makeMolecule import molecule_test_list, input_checker, store_bad_molecules, denormalize, heavy_atoms
+from src.results_processing import results_to_logfile
 import time
 from tensorflow.keras.models import load_model
 
@@ -37,9 +38,15 @@ for model in models:
 ensemble_prediction = np.mean(ensemble, axis=0)
 ensemble_sd = np.std(ensemble, axis=0)
 
-with open(str(save_folder + "/test_predictions.txt"), "w") as f:
-    f.write(str("Molecule \t Prediction \t Deviation \n"))
-    for m, p, s in zip(molecules, ensemble_prediction, ensemble_sd):
-        f.write(str(m) + '\t' + str(round(p, 4)) + '\t' + str(round(s, 4)) + '\n')
-    f.close()
+end = time.time()
+time_elapsed = end-start
+
+results_to_logfile(molecules, ensemble_prediction, ensemble_sd,
+                   target_property, molecule_file, time_elapsed, save_folder)
+
+# with open(str(save_folder + "/test_predictions.txt"), "w") as f:
+#     f.write(str("Molecule \t Prediction \t Deviation \n"))
+#     for m, p, s in zip(molecules, ensemble_prediction, ensemble_sd):
+#         f.write(str(m) + '\t' + str(round(p, 4)) + '\t' + str(round(s, 4)) + '\n')
+#     f.close()
 
