@@ -4,6 +4,7 @@ import sys
 from src.makeMolecule import molecule_list, normalize, input_checker, store_bad_molecules
 from src.crossDouble import training, write_statistics
 from src.gaussian import gmm
+from src.results_processing import train_results_to_logfile
 import time
 from src.plots import output_plot
 
@@ -33,4 +34,6 @@ cv_info = training(molecules, heavy_atoms, representations, outputs, save_folder
 end = time.time()
 time_elapsed = end-start
 
-write_statistics(cv_info, target_property, n_folds, time_elapsed, save_folder)
+results_list = write_statistics(cv_info, target_property, n_folds, time_elapsed, save_folder)
+train_results_to_logfile(molecules, outputs, results_list, representations,
+                         target_property, molecule_file, time_elapsed, save_folder)

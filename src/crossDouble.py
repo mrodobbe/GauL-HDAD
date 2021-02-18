@@ -38,6 +38,8 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
     models = []
     turn = 0
 
+    results_list = [["Molecule", "Real Value", "Prediction", "Deviation", "Error"]]
+
     for train2, val2 in kf.split(x_train_all):
         turn += 1
         x_train2 = x_train_all[train2]
@@ -236,9 +238,11 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
         f.write(str("Molecule \t Real Value \t Prediction \t Deviation \t Error \n"))
         for m, v, p, s, e in zip(test_molecules, y_test_nor, ensemble_prediction, ensemble_sd, ensemble_error):
             if target == "cp":
+                results_list.append([m, round(v[0], 2), round(p[0], 2), round(s[0], 2), round(e[0], 2)])
                 f.write(str(m) + '\t' + str(round(v[0], 4)) + '\t' + str(round(p[0], 4)) + '\t' +
                         str(round(s[0], 4)) + '\t' + str(round(e[0], 4)) + '\n')
             else:
+                results_list.append([m, round(v, 2), round(p, 2), round(s, 2), round(e, 2)])
                 f.write(str(m) + '\t' + str(round(v, 4)) + '\t' + str(round(p, 4)) + '\t' + str(round(s, 4)) +
                         '\t' + str(round(e, 4)) + '\n')
         f.close()
@@ -247,9 +251,9 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
     #                  model="ANN", fold=i)
     if target != "cp":
         return test_mean_absolute_error, test_root_mean_squared_error, ensemble_mae, ensemble_rmse, \
-               svr_mean_absolute_error, svr_root_mean_squared_error,
+               results_list, svr_mean_absolute_error, svr_root_mean_squared_error
     else:
-        return test_mean_absolute_error, test_root_mean_squared_error, ensemble_mae, ensemble_rmse
+        return test_mean_absolute_error, test_root_mean_squared_error, ensemble_mae, ensemble_rmse, results_list
 
 
 def training(molecules, heavy_atoms, representations, outputs, save_folder, target_property, n_folds):
@@ -274,12 +278,19 @@ def write_statistics(cv_info, target_property, n_folds, time_elapsed, save_folde
     prediction_rmse = []
     prediction_svr_mae = []
     prediction_svr_rmse = []
+    results_list = [["Molecule", "Real Value", "Prediction", "Deviation", "Error"]]
 
     test_models = []
     test_svr = []
     for j in range(n_folds):
         prediction_mae.append(cv_info[j][0])
         prediction_rmse.append(cv_info[j][1])
+        individual_results = cv_info[j][4]
+        print(cv_info)
+        print(individual_results)
+        individual_results.pop(0)
+        for c in individual_results:
+            results_list.append(c)
         if target_property != "cp":
             prediction_svr_mae.append(cv_info[j][2])
             prediction_svr_rmse.append(cv_info[j][3])
@@ -317,6 +328,7 @@ def write_statistics(cv_info, target_property, n_folds, time_elapsed, save_folde
         f.close()
 
     print("Finished! This took {} ".format(seconds_to_text(time_elapsed)))
+    return results_list
 
 
 def seconds_to_text(secs):
@@ -327,5 +339,5 @@ def seconds_to_text(secs):
     result = ("{} days, ".format(days) if days else "") + \
              ("{} hours, ".format(hours) if hours else "") + \
              ("{} minutes, ".format(minutes) if minutes else "") + \
-             ("{} seconds ".format(seconds) if seconds else "")
+             ("{} seconds".format(seconds) if seconds else "")
     return result
