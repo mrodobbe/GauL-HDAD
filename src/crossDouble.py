@@ -286,8 +286,6 @@ def write_statistics(cv_info, target_property, n_folds, time_elapsed, save_folde
         prediction_mae.append(cv_info[j][0])
         prediction_rmse.append(cv_info[j][1])
         individual_results = cv_info[j][4]
-        print(cv_info)
-        print(individual_results)
         individual_results.pop(0)
         for c in individual_results:
             results_list.append(c)

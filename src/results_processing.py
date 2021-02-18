@@ -1,5 +1,6 @@
 from src.crossDouble import seconds_to_text
 from src.makeModel import model_builder
+from src.plots import performance_plot
 import numpy as np
 
 
@@ -36,11 +37,14 @@ def train_results_to_logfile(molecules, outputs, results_list, representations,
         f.write("GauL HDAD was able to train a {} ensemble model.\n".format(target_property))
     f.write("Found input file:\t{}\n".format(molecule_file))
     f.write("Number of training molecules:\t{}\n\n".format(len(molecules)))
-    errors = [float(line[4]) for line in results_list[1:]]
+    errors = np.asarray([float(line[4]) for line in results_list[1:]]).astype(np.float)
+    predictions = np.asarray([float(line[2]) for line in results_list[1:]]).astype(np.float)
+    real = np.asarray([float(line[1]) for line in results_list[1:]]).astype(np.float)
+    performance_plot(real, predictions, "test", target_property, folder=save_folder, fold="all", model="ANN")
     mae = np.average(errors)
     rmse = np.sqrt(np.average(errors ** 2))
-    f.write("Ensemble MAE: {}\n".format(mae))
-    f.write("Ensemble RMSE: {}\n".format(rmse))
+    f.write("Ensemble MAE: {}\n".format(round(mae, 2)))
+    f.write("Ensemble RMSE: {}\n".format(round(rmse, 2)))
     f.write("================================================================================================\n")
     if len(outputs.shape) == 2:
         output_layer_size = outputs.shape[1]
