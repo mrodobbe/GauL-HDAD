@@ -87,6 +87,6 @@ python test.py <input_file> <target_property> <save_folder>
 ## How to refer to this model?
 When using GauL-Thermo for your own publication, please cite the original paper:
 
-Learning Molecular Representations for Thermochemistry Prediction of Cyclic Hydrocarbons and Oxygenates
-Dobbelaere, M.R.; Plehiers, P.; Van de Vijver, R.;  Stevens, C.V.; Van Geem, K.M.
-Submitted to Journal of Physical Chemistry A
+Learning Molecular Representations for Thermochemistry Prediction of Cyclic Hydrocarbons and Oxygenates <br>
+Dobbelaere, M.R.; Plehiers, P.; Van de Vijver, R.;  Stevens, C.V.; Van Geem, K.M. <br>
+Submitted to Journal of Physical Chemistry A, 2021
