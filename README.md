@@ -25,9 +25,9 @@ Models can only be trained when data is provided. GauL-Thermo can handle `.txt` 
 Three molecular formats can be parsed: SMILES, InChI and 3D coordinates in `.mol` files. When your data contains mesomeric radicals, use of InChIs is discouraged.
 
 ```
-CC  100
-InChI=1S/C2H6/c1-2/h1-2H3 100
-ethane.mol  100
+CC 100
+InChI=1S/C2H6/c1-2/h1-2H3 100
+ethane.mol 100
 
 ```
 
