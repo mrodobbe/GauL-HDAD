@@ -2,12 +2,10 @@ from src.representation import represent
 import numpy as np
 import sys
 from src.makeMolecule import molecule_list, normalize, input_checker, store_bad_molecules
-from src.crossDouble import run_cv, training, write_statistics
+from src.crossDouble import training, write_statistics
 from src.gaussian import gmm
 import time
 from src.plots import output_plot
-from sklearn.model_selection import KFold
-from joblib import Parallel, delayed, cpu_count
 
 start = time.time()
 
