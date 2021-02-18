@@ -44,7 +44,7 @@ def performance_plot(outputs, predictions, test, prop, folder="newPredictions", 
         ax.spines[axis].set_linewidth(1.5)
     ax.tick_params(direction='in', top=True, right=True, color='black', width=2)
     ax.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
-    ax.set_xlabel(str("CBS-QB3 " + prop + " [" + metric + "]"), **hfont)
+    ax.set_xlabel(str("Ab Initio " + prop + " [" + metric + "]"), **hfont)
     ax.set_ylabel(str("ANN predicted " + prop + " [" + metric + "]"), **hfont)
     for tick in ax.get_xticklabels():
         tick.set_fontname("UGent Panno Text")
