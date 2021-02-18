@@ -8,7 +8,7 @@ For small datasets (<1000 molecules), it is possible to train on a standard lapt
 
 GauL-Thermo is written in python and can be run from command prompt. This requires the installation of several python packages, which are listed below. It is recommended to use Anaconda for managing packages (https://docs.anaconda.com/anaconda/install/).
 * Python 3.6 or higher
-* NumPy         `conda install numpy`
+* NumPy <p> `conda install numpy`
 * RDKit         `conda install -c conda-forge rdkit`
 * Scikit-learn  `conda install -c conda-forge scikit-learn`
 * joblib        `conda install -c anaconda joblib`
