@@ -1,5 +1,6 @@
 from src.crossDouble import seconds_to_text
 from src.makeModel import model_builder
+import numpy as np
 
 
 def test_results_to_logfile(molecules, predictions, deviations, target_property, molecule_file, time_elapsed, save_folder):
@@ -35,7 +36,12 @@ def train_results_to_logfile(molecules, outputs, results_list, representations,
         f.write("GauL HDAD was able to train a {} ensemble model.\n".format(target_property))
     f.write("Found input file:\t{}\n".format(molecule_file))
     f.write("Number of training molecules:\t{}\n\n".format(len(molecules)))
-    f.write("================================\n")
+    errors = [float(line[4]) for line in results_list[1:]]
+    mae = np.average(errors)
+    rmse = np.sqrt(np.average(errors ** 2))
+    f.write("Ensemble MAE: {}\n".format(mae))
+    f.write("Ensemble RMSE: {}\n".format(rmse))
+    f.write("================================================================================================\n")
     if len(outputs.shape) == 2:
         output_layer_size = outputs.shape[1]
     else:
@@ -46,6 +52,6 @@ def train_results_to_logfile(molecules, outputs, results_list, representations,
     for line in results_list:
         f.write(str(str(line[0]) + "\t" + str(line[1]) + "\t" + str(line[2]) + "\t" +
                     str(line[3]) + "\t" + str(line[4]) + "\n"))
-    f.write("================================\n")
+    f.write("================================================================================================\n")
     f.write("\nPredictions were made in {}.".format(seconds_to_text(time_elapsed)))
     f.close()
