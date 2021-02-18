@@ -54,6 +54,7 @@ python train.py Data/input.txt h Results
 **WARNING:** If `save_folder` already exists, the existing data will be overwritten!
 
 A large number of files will be created in `<save_folder>`. 
+* `train_results.log` gives all information you need: model architecture, preediction statistics and individual predictions
 * `output_plot.png` shows the input data as a function of the number of heavy atoms. This gives an idea about the distribution of your data.
 * `hist` is a folder that contains all individual histograms.
 * `gmm` is a folder that contains the Gaussian mixture models of the histograms in `hist`.
