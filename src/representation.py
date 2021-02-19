@@ -85,6 +85,7 @@ def load_representations(molecules, conformers, save_folder):
         with open(str(save_folder + "/test_representations.pickle"), "rb") as f:
             representations = pickle.load(f)
         print("Loaded the molecule representations!")
+        representations = np.asarray(representations).astype(np.float)
         return representations, molecules
     except FileNotFoundError:
         print("No representations available! Trying to find a gmm dictionary")

@@ -107,11 +107,8 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
             print('Mean absolute error:\t\t{:.2f} kJ/mol'.format(svr_mean_absolute_error))
             print('Root mean squared error:\t{:.2f} kJ/mol'.format(svr_root_mean_squared_error))
 
-        if target != "h":
-            test_predictions = denormalize(test_predictions, heavy_test, target, coefficient=1.5)
-            y_test_normalized = denormalize(y_test, heavy_test, target, coefficient=1.5)
-        else:
-            y_test_normalized = y_test
+        test_predictions = denormalize(test_predictions, heavy_test, target)
+        y_test_normalized = denormalize(y_test, heavy_test, target)
 
         test_error = np.abs(test_predictions - y_test_normalized)
         test_mean_absolute_error = np.average(test_error)
