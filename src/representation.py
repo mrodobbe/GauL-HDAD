@@ -76,6 +76,7 @@ def represent(molecules, conformers, gmm_dict, save_folder):
     with open(str(save_folder + "/representations.pickle"), "wb") as f:
         pickle.dump(representations, f)
     print("Dumped the molecule representations!")
+    text_representation(molecules, stacked_representations, gmm_dict, save_folder)
     return stacked_representations, bad
 
 
@@ -97,3 +98,18 @@ def load_representations(molecules, conformers, save_folder):
         except FileNotFoundError:
             print("No gmm dictionary found. Please include a gmm dictionary in {}".format(save_folder))
             raise
+
+
+def text_representation(molecules, representations, gmm_dict, save_folder):
+    labels = ["Label"]
+    mu = ["Mu"]
+    sigma = ["Sigma"]
+    for label in gmm_dict:
+        for m, s in gmm_dict[label]:
+            labels.append(label)
+            mu.append(round(m, 4))
+            sigma.append(round(s, 4))
+    with_name = np.vstack((molecules, representations.T)).T
+    all_data = np.vstack((labels, mu, sigma, with_name))
+    np.savetxt(str(save_folder + "/fingerprints.txt"), all_data, fmt='%s')
+    print("The molecular fingerprints can be evaluated  in {}".format(str(save_folder + "/fingerprints.txt")))
