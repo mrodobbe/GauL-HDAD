@@ -92,8 +92,18 @@ def gmm(data, conformers, save_folder):
     print("Finished calculating all geometry features.")
     store_histograms(geometry_dict, save_folder)
     print("Created histograms and saved them!")
+    with open("list_peaks.txt", 'r') as g:
+        listed_peaks = [row[:-1].split('\t')[0] for row in g]
+    f = open(str(save_folder + "/all_peaks.txt"), "w")
+    peak_file = open("list_peaks.txt", 'a')
     for key in geometry_dict:
         print(key)
+        f.write(str(key + "\n"))
+        if key not in listed_peaks:
+            peak_file.write(str(key + "\t" + str(2) + "\n"))
+            print("{} was not listed in list_peaks.txt. It will be clustered with 2 peaks".format(key))
+    f.close()
+    peak_file.close()
     ll_dict = {}
     gmm_dict = {}
     n_jobs = cpu_count() - 5
