@@ -109,7 +109,12 @@ def text_representation(molecules, representations, gmm_dict, save_folder):
             labels.append(label)
             mu.append(round(m, 4))
             sigma.append(round(s, 4))
+    labels.append("Radical")
+    mu.append("0")
+    sigma.append("0")
     with_name = np.vstack((molecules, representations.T)).T
+    print(with_name.shape)
+    print(len(labels))
     all_data = np.vstack((labels, mu, sigma, with_name))
     np.savetxt(str(save_folder + "/fingerprints.txt"), all_data, fmt='%s')
-    print("The molecular fingerprints can be evaluated  in {}".format(str(save_folder + "/fingerprints.txt")))
+    print("The molecular fingerprints can be evaluated in {}".format(str(save_folder + "/fingerprints.txt")))
