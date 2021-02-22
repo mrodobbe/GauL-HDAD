@@ -13,6 +13,7 @@ def molecule_test_list(molecule_file):
     Similar to molecule_list, without outputs provided.
     """
 
+    license_disclaimer()
     try:
         with open(molecule_file, 'r') as f:
             molecules_full = f.readlines()
@@ -51,6 +52,7 @@ def molecule_list(molecule_file, suppress="no"):
     """
     This function turns the input file into a list of identifiers.
     """
+    license_disclaimer()
     try:
         with open(molecule_file, 'r') as f:
             molecules_full = f.readlines()
@@ -324,3 +326,16 @@ def input_checker(args, filename):
                 os.mkdir(str(folder + "/hist"))
             except FileExistsError:
                 print("Folders already exist.")
+
+
+def license_disclaimer():
+    print("\n\n------------------------------------------------------------------------------------------------------\n"
+          "GauL-HDAD  Copyright (C) 2021 Maarten R. Dobbelaere \n"
+          "This program comes with ABSOLUTELY NO WARRANTY; for details open the `LICENSE` file. \n"
+          "This is free software, and you are welcome to redistribute it \n"
+          "under certain conditions; for details open the `LICENSE` file.\n\n"
+          "When using GauL-HDAD for your own publication, please refer to the original paper:\n"
+          "Learning Molecular Representations for Thermochemistry Prediction of Cyclic Hydrocarbons and Oxygenates\n"
+          "Dobbelaere, M.R.; Plehiers, P.P.; Van de Vijver, R.; Stevens, C.V.; Van Geem, K.M.\n"
+          "Submitted to Journal of Physical Chemistry A, 2021\n"
+          "------------------------------------------------------------------------------------------------------\n\n")
