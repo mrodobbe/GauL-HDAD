@@ -1,4 +1,4 @@
-# GauL-Thermo
+# GauL-HDAD
 Machine learning method for predicting thermochemical (and many more) properties
 
 This repository contains the GauL HDAD algorithm for representing molecules as a numeric vector and neural networks for molecular property prediction.
@@ -86,7 +86,7 @@ python test.py <input_file> <target_property> <save_folder>
 `<save_folder>` is the folder where the model was trained that you want to use for testing.
 
 ## How to refer to this model?
-When using GauL-Thermo for your own publication, please cite the original paper:
+When using GauL-HDAD for your own publication, please cite the original paper:
 
 *Learning Molecular Representations for Thermochemistry Prediction of Cyclic Hydrocarbons and Oxygenates <br>
 Dobbelaere, M.R.; Plehiers, P.P.; Van de Vijver, R.;  Stevens, C.V.; Van Geem, K.M. <br>
