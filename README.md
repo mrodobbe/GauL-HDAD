@@ -46,7 +46,7 @@ python train.py <input_file> <target_property> <save_folder>
   * Something else can be used for another property, the models will be trained, but are possibly not optimal.
 * `<save_folder>` is the folder where you want to store your results. This folder will be created as a subfolder of the repository
 
-Example: Your enthalpy data is stored in a subfolder `Data` as `input.txt` and you want to store your results in a folder `Results`:
+Example: Your enthalpy data is stored in a subfolder `Data` as `input.txt` and you want to store your results in a folder named `Results`:
 ```
 python train.py Data/input.txt h Results
 ```
@@ -89,5 +89,5 @@ python test.py <input_file> <target_property> <save_folder>
 When using GauL-Thermo for your own publication, please cite the original paper:
 
 *Learning Molecular Representations for Thermochemistry Prediction of Cyclic Hydrocarbons and Oxygenates <br>
-Dobbelaere, M.R.; Plehiers, P.; Van de Vijver, R.;  Stevens, C.V.; Van Geem, K.M. <br>
+Dobbelaere, M.R.; Plehiers, P.P.; Van de Vijver, R.;  Stevens, C.V.; Van Geem, K.M. <br>
 Submitted to Journal of Physical Chemistry A, 2021*
