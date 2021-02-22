@@ -7,6 +7,7 @@ import numpy as np
 def test_results_to_logfile(molecules, predictions, deviations, target_property, molecule_file, time_elapsed, save_folder):
     filename = str(save_folder + "/test_results.log")
     f = open(filename, "w")
+    license_to_log(f)
     property_dict = {"h": "standard enthalpy of formation",
                      "s": "standard entropy",
                      "cp": "heat capacity"}
@@ -28,6 +29,7 @@ def train_results_to_logfile(molecules, outputs, results_list, representations,
                              target_property, molecule_file, time_elapsed, save_folder):
     filename = str(save_folder + "/train_results.log")
     f = open(filename, "w")
+    license_to_log(f)
     property_dict = {"h": "standard enthalpy of formation",
                      "s": "standard entropy",
                      "cp": "heat capacity"}
@@ -59,3 +61,24 @@ def train_results_to_logfile(molecules, outputs, results_list, representations,
     f.write("================================================================================================\n")
     f.write("\nPredictions were made in {}.".format(seconds_to_text(time_elapsed)))
     f.close()
+
+
+def license_to_log(f):
+    f.write("================================================================================================\n"
+            "Copyright (C) 2021  Maarten R. Dobbelaere\n\n"
+            "GauL-HDAD is free software: you can redistribute it and/or modify\n"
+            "it under the terms of the GNU General Public License as published by\n"
+            "the Free Software Foundation, either version 3 of the License, or\n"
+            "(at your option) any later version.\n\n"
+            "GauL-HDAD is distributed in the hope that it will be useful,\n"
+            "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+            "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+            "GNU General Public License for more details.\n\n"
+            "You should have received a copy of the GNU General Public License\n"
+            "along with this program.  If not, see <https://www.gnu.org/licenses/>.\n\n"
+            "When using GauL-HDAD for your own publication, please refer to the original paper:\n"
+            "Learning Molecular Representations for Thermochemistry "
+            "Prediction of Cyclic Hydrocarbons and Oxygenates\n"
+            "Dobbelaere, M.R.; Plehiers, P.P.; Van de Vijver, R.; Stevens, C.V.; Van Geem, K.M.\n"
+            "Submitted to Journal of Physical Chemistry A, 2021\n"
+            "================================================================================================\n\n")
