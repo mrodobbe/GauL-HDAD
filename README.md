@@ -1,4 +1,4 @@
-# GauL-Thermo
+# GauL-HDAD
 Machine learning method for predicting thermochemical (and many more) properties
 
 This repository contains the GauL HDAD algorithm for representing molecules as a numeric vector and neural networks for molecular property prediction.
@@ -6,7 +6,7 @@ This repository contains the GauL HDAD algorithm for representing molecules as a
 ## Requirements
 For small datasets (<1000 molecules), it is possible to train on a standard laptop in less than 30 minutes. It is recommended to use high-performance computing for larger datasets. Please keep in mind that training large datasets (>40000 molecules) will take more than 2 days.
 
-GauL-Thermo is written in python and can be run from command prompt. This requires the installation of several python packages, which are listed below. It is recommended to use Anaconda for managing packages (https://docs.anaconda.com/anaconda/install/).
+GauL-HDAD is written in python and can be run from command prompt. This requires the installation of several python packages, which are listed below. It is recommended to use Anaconda for managing packages (https://docs.anaconda.com/anaconda/install/).
 * Python 3.6 or higher
 * NumPy         `conda install numpy`
 * RDKit         `conda install -c conda-forge rdkit`
@@ -16,12 +16,12 @@ GauL-Thermo is written in python and can be run from command prompt. This requir
 * matplotlib    `conda install -c conda-forge matplotlib`
 
 ## Installation
-GauL-Thermo can be used by cloning this repository and moving in the Anaconda terminal to the folder in which it was cloned.
+GauL-HDAD can be used by cloning this repository and moving in the Anaconda terminal to the folder in which it was cloned.
 * Open Anaconda Prompt (Anaconda3) from the Windows start menu
-* Use the `cd` command in Anaconda Prompt to go to the folder where GauL-Thermo was cloned
+* Use the `cd` command in Anaconda Prompt to go to the folder where GauL-HDAD was cloned
 
 ## Data
-Models can only be trained when data is provided. GauL-Thermo can handle `.txt` files containing molecules and target values, separated by a tab.
+Models can only be trained when data is provided. GauL-HDAD can handle `.txt` files containing molecules and target values, separated by a tab.
 Three molecular formats can be parsed: SMILES, InChI and 3D coordinates in `.mol` files. When your data contains mesomeric radicals, use of InChIs is discouraged.
 
 ```
@@ -86,7 +86,7 @@ python test.py <input_file> <target_property> <save_folder>
 `<save_folder>` is the folder where the model was trained that you want to use for testing.
 
 ## How to refer to this model?
-When using GauL-Thermo for your own publication, please cite the original paper:
+When using GauL-HDAD for your own publication, please cite the original paper:
 
 *Learning Molecular Representations for Thermochemistry Prediction of Cyclic Hydrocarbons and Oxygenates <br>
 Dobbelaere, M.R.; Plehiers, P.P.; Van de Vijver, R.;  Stevens, C.V.; Van Geem, K.M. <br>
