@@ -4,6 +4,7 @@ from rdkit.Chem.rdMolTransforms import ComputePrincipalAxesAndMoments as Inertia
 from rdkit.Chem.Descriptors import NumRadicalElectrons
 import numpy as np
 import math
+import os
 
 
 def molecule_test_list(molecule_file):
@@ -12,13 +13,31 @@ def molecule_test_list(molecule_file):
     Similar to molecule_list, without outputs provided.
     """
 
-    with open(molecule_file, 'r') as f:
-        molecules_full = f.readlines()
+    license_disclaimer()
+    try:
+        with open(molecule_file, 'r') as f:
+            molecules_full = f.readlines()
+    except FileNotFoundError:
+        print("The input file does not exist.")
+        raise
 
     molecules = []
+    conformers = []
+    bad_molecules = []
 
     for line in molecules_full:
         line = line[:-1]
+        try:
+            c = conformer(line)
+            conformers.append(c)
+        except ValueError:
+            print("{} is a bad molecule!".format(line[0]))
+            bad_molecules.append(line[0])
+            continue
+
+        # TODO: Instead of removing the molecule, a method must be created to figure out the coordinates of the molecule
+
+        # print(line[0])
         molecules.append(line)
 
     if len(molecules) == 1:
@@ -26,35 +45,36 @@ def molecule_test_list(molecule_file):
     else:
         print("{} contains {} molecules".format(str(molecule_file), len(molecules)))
 
-    return molecules
+    return molecules, conformers, bad_molecules
 
 
 def molecule_list(molecule_file, suppress="no"):
     """
     This function turns the input file into a list of identifiers.
     """
-
-    with open(molecule_file, 'r') as f:
-        molecules_full = f.readlines()
+    license_disclaimer()
+    try:
+        with open(molecule_file, 'r') as f:
+            molecules_full = f.readlines()
+    except FileNotFoundError:
+        print("The input file does not exist.")
+        raise
 
     molecules = []  # Create empty lists
     outputs = []
+    conformers = []
     bad_molecules = []
 
     for line in molecules_full:
         line = line[:-1].split('\t')
-        # Check if the molecule can be handled by RDKit
-        # TODO: The parsing step takes too much time ==> Optimize!
-        if input_type(line):
-            try:
-                conformer(line[0])
-            except ValueError:
-                try:
-                    conformer(line[0])
-                except ValueError:
-                    print("{} is a bad molecule!".format(line[0]))
-                    bad_molecules.append(line[0])
-                    continue
+        print(line[0])
+        try:
+            c = conformer(line[0])
+            conformers.append(c)
+        except ValueError:
+            print("{} is a bad molecule!".format(line[0]))
+            bad_molecules.append(line[0])
+            continue
 
         # TODO: Instead of removing the molecule, a method must be created to figure out the coordinates of the molecule
 
@@ -86,7 +106,15 @@ def molecule_list(molecule_file, suppress="no"):
         else:
             print("{} contains {} molecules".format(str(molecule_file), len(molecules)))
 
-    return molecules, outputs, bad_molecules
+    return molecules, outputs, conformers, bad_molecules
+
+
+def store_bad_molecules(bad_molecules, save_folder):
+    if len(bad_molecules) > 0:
+        np.savetxt(str(save_folder + "/bad_molecules.txt"), bad_molecules, fmt="%s")
+        print("Dumped a list with molecules which could not be parsed in Output/bad_molecules.txt")
+    else:
+        print("All molecules can be parsed by RDKit")
 
 
 def molecule(line):
@@ -95,6 +123,8 @@ def molecule(line):
     """
     if line.__contains__("InChI"):  # Molecule in InChI format
         return Chem.MolFromInchi(line)
+    elif line.endswith(".mol"):
+        return rdmolfiles.MolFromMolFile(line, removeHs=False)
     elif ":" in line:  # Molecule as parsed.mol file
         if line.endswith(".xyz"):
             mol_file = str(line[:-8] + "/parsed.mol")
@@ -113,6 +143,8 @@ def molecule(line):
 def input_type(line):
     if line.__contains__("InChI"):
         return True
+    elif line.__contains__(".mol"):
+        return False
     elif ":" in line:
         return False
     else:
@@ -134,14 +166,11 @@ def conformer(mol_name):
     else:
         mol = molecule(mol_name)
         mol_h = Chem.AddHs(mol)
-        AllChem.EmbedMolecule(mol_h, useRandomCoords=True)
+        AllChem.EmbedMolecule(mol_h, useRandomCoords=False)
         try:
             AllChem.MMFFOptimizeMolecule(mol_h, maxIters=10000)
         except ValueError:
-            try:
-                AllChem.UFFOptimizeMolecule(mol_h, maxIters=10000)
-            except ValueError:
-                pass
+            pass
         return mol_h.GetConformer(), mol_h.GetNumAtoms(), mol_h
 
 
@@ -152,35 +181,44 @@ def heavy_atoms(mol):
 
 
 def normalize(molecules, outputs, thermo, coefficient=None):
-    property_dict = {"entropy": 1,
-                     "s": 1,
+    property_dict = {"entropy": 1.5,
+                     "s": 1.5,
                      "cp": 1.5}
-    if coefficient is None:
+    if coefficient is None and thermo in property_dict:
         coefficient = property_dict[thermo]
-    normalized_output = []
-    heavy = []
-    for mol, output in zip(molecules, outputs):
-        ha = heavy_atoms(mol)
-        heavy.append(ha)
-        normed = output / (math.log10(ha) ** coefficient)
-        normalized_output.append(normed)
+    elif coefficient is not None:
+        coefficient = float(coefficient)
+    if thermo in property_dict or coefficient is not None:
+        normalized_output = []
+        heavy = []
+        for mol, output in zip(molecules, outputs):
+            ha = heavy_atoms(mol)
+            heavy.append(ha)
+            normed = output / (math.log(ha) ** coefficient)
+            normalized_output.append(normed)
+    else:
+        heavy = [heavy_atoms(mol) for mol in molecules]
+        normalized_output = outputs
     normalized_output = np.asarray(normalized_output).astype(np.float)
     heavy = np.asarray(heavy)
     return normalized_output, heavy
 
 
 def denormalize(outputs, heavy, thermo, coefficient=None):
-    property_dict = {"entropy": 1,
-                     "s": 1,
+    property_dict = {"entropy": 1.5,
+                     "s": 1.5,
                      "cp": 1.5}
-    if coefficient is None:
+    if coefficient is None and thermo in property_dict:
         coefficient = property_dict[thermo]
-    else:
+    elif coefficient is not None:
         coefficient = float(coefficient)
-    original = []
-    for s, n in zip(outputs, heavy):
-        original.append(s * (math.log10(n)) ** coefficient)
-    original = np.asarray(original).astype(np.float)
+    if thermo in property_dict or coefficient is not None:
+        original = []
+        for s, n in zip(outputs, heavy):
+            original.append(s * (math.log(n)) ** coefficient)
+        original = np.asarray(original).astype(np.float)
+    else:
+        original = outputs
     return original
 
 
@@ -263,3 +301,42 @@ def add_n(molecules, representations):
         t_r.append(t)
     new_representations = np.stack(t_r)
     return new_representations
+
+
+def input_checker(args, filename):
+    if len(args) < 4:
+        print("Not enough input files.\nPlease use the following command structure:\n"
+              "python {}.py <molecule_file> <property> <save_folder>".format(filename))
+        raise IndexError
+    else:
+        if filename == "train":
+            folder = args[3]
+            try:
+                os.mkdir(folder)
+            except PermissionError:
+                print("No permission to create folder.\nThere are two ways to solve the problem:\n"
+                      "1) Open Anaconda as Administrator\n"
+                      "2) Manually create the subdirectory Output with 2 additional "
+                      "subdirectories in Output: gmm and hist")
+                raise
+            except FileExistsError:
+                print("Folder already exists. Data in this folder will be overwritten.")
+
+            try:
+                os.mkdir(str(folder + "/gmm"))
+                os.mkdir(str(folder + "/hist"))
+            except FileExistsError:
+                print("Folders already exist.")
+
+
+def license_disclaimer():
+    print("\n\n------------------------------------------------------------------------------------------------------\n"
+          "GauL-HDAD  Copyright (C) 2021 Maarten R. Dobbelaere \n"
+          "This program comes with ABSOLUTELY NO WARRANTY; for details open the `LICENSE` file. \n"
+          "This is free software, and you are welcome to redistribute it \n"
+          "under certain conditions; for details open the `LICENSE` file.\n\n"
+          "When using GauL-HDAD for your own publication, please refer to the original paper:\n"
+          "Learning Molecular Representations for Thermochemistry Prediction of Cyclic Hydrocarbons and Oxygenates\n"
+          "Dobbelaere, M.R.; Plehiers, P.P.; Van de Vijver, R.; Stevens, C.V.; Van Geem, K.M.\n"
+          "Submitted to Journal of Physical Chemistry A, 2021\n"
+          "------------------------------------------------------------------------------------------------------\n\n")
