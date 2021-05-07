@@ -25,6 +25,9 @@ def performance_plot(outputs, predictions, test, prop, folder="newPredictions", 
         metric = "J mol$^{-1}$ K$^{-1}$"
         outputs = outputs[:, 0]
         predictions = predictions[:, 0]
+    elif prop == "E":
+        prop = "E$_{tot}$ + ZPVE"
+        metric = "eV"
     else:
         metric = "-"
     if "test" in test:

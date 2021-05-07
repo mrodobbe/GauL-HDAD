@@ -17,6 +17,9 @@ def model_builder(representations, output_size, prop):
     optimal_layers = np.asarray([[860, 460, 50, 560, 140],
                                  [400, 100, 40, 800, 900],
                                  [200, 500, 30, 600, 900]])
+    # optimal_layers = np.asarray([[860, 460, 50, 560, 140],
+    #                              [150, 100, 50, 100, 150],
+    #                              [200, 500, 30, 600, 900]])
     if prop == "h":
         row = 0
     elif prop == "s":

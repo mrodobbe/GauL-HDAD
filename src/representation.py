@@ -36,10 +36,12 @@ def gaul_representation(mol, conformer_tuple, theta_dict):
                     continue
                 else:
                     gt = g/gs
-            # elif name == "C1":
-            #     gt = [1]
+            elif name == "C1":
+                gt = [1]
             # elif name == "O1":
             #     gt = [1]
+            elif theta.shape[0] == 0:
+                continue
             else:
                 gd = gauss(value, theta[0], theta[1])
                 g.append(gd)
@@ -76,7 +78,7 @@ def represent(molecules, conformers, gmm_dict, save_folder):
     with open(str(save_folder + "/representations.pickle"), "wb") as f:
         pickle.dump(representations, f)
     print("Dumped the molecule representations!")
-    text_representation(molecules, stacked_representations, gmm_dict, save_folder)
+    # text_representation(molecules, stacked_representations, gmm_dict, save_folder)
     return stacked_representations, bad
 
 
