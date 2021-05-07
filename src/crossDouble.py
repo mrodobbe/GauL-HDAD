@@ -36,7 +36,9 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
     mae_ann = []
     mae_svr = []
     models = []
+    svr_models = []
     turn = 0
+    svr_ensemble = np.array([])
 
     results_list = [["Molecule", "Real Value", "Prediction", "Deviation", "Error"]]
 
@@ -58,7 +60,7 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
         print('{} training molecules, {} validation molecules'.format(len(x_train2),
                                                                       len(x_val2)))
 
-        es = EarlyStopping(patience=150, restore_best_weights=True, min_delta=0.01, mode='min')
+        es = EarlyStopping(patience=50, restore_best_weights=True, min_delta=0.01, mode='min')
 
         class LossHistory(Callback):
             def on_epoch_end(self, batch, logs={}):
@@ -81,7 +83,7 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
             test_predictions = np.asarray(model.predict(x_test)).astype(np.float)
 
         intermediate_layer = Model(inputs=model.input, outputs=model.get_layer('layer_3').output)
-        training_intermediates = np.asarray(intermediate_layer(x_train_all)).astype(np.float)
+        training_intermediates = np.asarray(intermediate_layer(x_train2)).astype(np.float)
         test_intermediates = np.asarray(intermediate_layer(x_test)).astype(np.float)
 
         models.append(model)
@@ -89,7 +91,7 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
         if target != "cp":
             krr = SVR(kernel="rbf", gamma='scale', C=2.5e3)  # This is the support vector machine.
             # Try to find an algorithm that optimizes gamma and C. You can also add an epsilon factor
-            krr.fit(training_intermediates, y_train_all)  # Execute regression
+            krr.fit(training_intermediates, y_train2)  # Execute regression
 
             y_svr = krr.predict(test_intermediates)  # Prediction for the test set (unseen data)
             if target == "s":
@@ -97,11 +99,18 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
                 y_test_svr = denormalize(y_test, heavy_test, target, coefficient=1.5)
             else:
                 y_test_svr = y_test
+
+            if len(svr_ensemble) == 0:
+                svr_ensemble = y_svr
+            else:
+                svr_ensemble = np.vstack((svr_ensemble, y_svr))
+
             svr_error = np.abs(y_svr - y_test_svr)
             svr_mean_absolute_error = np.average(svr_error)
             mae_svr.append(svr_mean_absolute_error)
             svr_root_mean_squared_error = np.sqrt(np.average(svr_error ** 2))
             rmse_svr.append(svr_root_mean_squared_error)
+            svr_models.append(krr)
 
             print('Test performance statistics for SVR:')
             print('Mean absolute error:\t\t{:.2f} kJ/mol'.format(svr_mean_absolute_error))
@@ -134,6 +143,18 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
 
     if target != "cp":
         svr_index = np.argmin(rmse_svr)
+
+    if target != "cp":
+        svr_index = np.argmin(rmse_svr)
+        svr_mean_absolute_error = mae_svr[svr_index]
+        svr_root_mean_squared_error = rmse_svr[svr_index]
+        svr_best_model = svr_models[svr_index]
+        dump(svr_best_model, "svr_{}.joblib".format(i))
+        svr_ensemble_prediction = np.mean(svr_ensemble, axis=0)
+        svr_ensemble_sd = np.std(svr_ensemble, axis=0)
+        svr_ensemble_error = np.abs(svr_ensemble_prediction - y_test_svr)
+        svr_ensemble_mae = np.average(svr_ensemble_error)
+        svr_ensemble_rmse = np.sqrt(np.average(svr_ensemble_error ** 2))
 
     test_mean_absolute_error = mae_ann[ann_index]
     test_root_mean_squared_error = rmse_ann[ann_index]
@@ -215,7 +236,7 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
 
     with open(str(save_folder + "/Fold {}/test_predictions_{}.txt".format(i, i)), "w") as f:
         f.write(str("Molecule \t Real Value \t Prediction \t Absolute Error \n"))
-        for m, v, p, e in zip(test_molecules, y_test, best_predictions, best_error):
+        for m, v, p, e in zip(test_molecules, y_best_normalized, best_predictions, best_error):
             if target == "cp":
                 f.write(str(m) + '\t' + str(round(v[0], 4)) + '\t' + str(round(p[0], 4)) + '\t' +
                         str(round(e[0], 4)) + '\n')
@@ -248,7 +269,7 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
     #                  model="ANN", fold=i)
     if target != "cp":
         return test_mean_absolute_error, test_root_mean_squared_error, ensemble_mae, ensemble_rmse, \
-               results_list, svr_mean_absolute_error, svr_root_mean_squared_error
+               results_list, svr_mean_absolute_error, svr_root_mean_squared_error, svr_ensemble_mae, svr_ensemble_rmse
     else:
         return test_mean_absolute_error, test_root_mean_squared_error, ensemble_mae, ensemble_rmse, results_list
 
@@ -376,13 +397,13 @@ def training(molecules, heavy_atoms, representations, outputs, save_folder, targ
     else:
         n_jobs = n_folds
 
-    # cv_info = Parallel(n_jobs=n_jobs)(delayed(run_cv)(molecules, heavy_atoms, representations, outputs,
-    #                                                   loop_kf, i, save_folder, target_property)
-    #                                   for loop_kf, i in zip(kf.split(representations), range(1, n_folds+1)))
-
-    cv_info = Parallel(n_jobs=n_jobs)(delayed(run_cv_svr)(molecules, heavy_atoms, representations, outputs,
-                                                          loop_kf, i, save_folder, target_property)
+    cv_info = Parallel(n_jobs=n_jobs)(delayed(run_cv)(molecules, heavy_atoms, representations, outputs,
+                                                      loop_kf, i, save_folder, target_property)
                                       for loop_kf, i in zip(kf.split(representations), range(1, n_folds+1)))
+
+    # cv_info = Parallel(n_jobs=n_jobs)(delayed(run_cv_svr)(molecules, heavy_atoms, representations, outputs,
+    #                                                       loop_kf, i, save_folder, target_property)
+    #                                   for loop_kf, i in zip(kf.split(representations), range(1, n_folds+1)))
 
     return cv_info
 
