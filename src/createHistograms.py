@@ -1,5 +1,6 @@
 from src.geometryFeatures import bonds, angles, dihedrals
 import matplotlib.pyplot as plt
+from src.conformer import conformer_generation
 from src.makeMolecule import conformer, input_type, molecule
 from rdkit import Chem
 from rdkit.Chem import AllChem
@@ -9,17 +10,19 @@ def all_values(data, conformers):
     hist_input = {}
     for mol, conformer_tuple in zip(data, conformers):
         print(mol)
-        conf, n, mol_h = conformer_tuple
-        dist = bonds(conf, n, mol_h)
-        angs = angles(conf, n, mol_h)
-        dihs = dihedrals(conf, n, mol_h)
-        geo = (dist[0] + angs[0] + dihs[0], dist[1] + angs[1] + dihs[1])
-        for value, name in zip(*geo):
-            # print(value, name)
-            if name in hist_input:
-                hist_input[name].append(value)
-            else:
-                hist_input[name] = [value]
+        conf_min, n_atoms, mol_h_min = conformer_tuple
+        confs, n, mol_h = conformer_generation(mol)
+        for conf in confs:
+            dist = bonds(conf, n, mol_h)
+            angs = angles(conf, n, mol_h)
+            dihs = dihedrals(conf, n, mol_h)
+            geo = (dist[0] + angs[0] + dihs[0], dist[1] + angs[1] + dihs[1])
+            for value, name in zip(*geo):
+                # print(value, name)
+                if name in hist_input:
+                    hist_input[name].append(value)
+                else:
+                    hist_input[name] = [value]
     return hist_input
 
 
