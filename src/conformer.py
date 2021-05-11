@@ -5,6 +5,7 @@ from rdkit.Chem import rdDistGeom, AllChem, rdMolDescriptors
 
 def conformer_generation(mol_name):
     mol = Chem.AddHs(molecule(mol_name))
+    print(mol_name)
     n_atoms = mol.GetNumAtoms()
     n = rdMolDescriptors.CalcNumRotatableBonds(mol)
     num_confs = min(3 ** n, 243)
