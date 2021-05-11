@@ -18,11 +18,11 @@ molecules, outputs, conformers, bad_molecules = molecule_list(molecule_file)
 store_bad_molecules(bad_molecules, save_folder)
 output_plot(molecules, outputs, target_property, folder=save_folder)
 
-representations, molecules = load_representations(molecules, conformers, save_folder)
+representations, molecules, gmm_dict = load_representations(molecules, conformers, save_folder)
 outputs, heavy_atoms = normalize(molecules, outputs, target_property)
 
 n_folds = 10  # TODO: Make argument
-cv_info = training(molecules, heavy_atoms, representations, outputs, save_folder, target_property, n_folds)
+cv_info = training(molecules, heavy_atoms, representations, outputs, gmm_dict, save_folder, target_property, n_folds)
 
 end = time.time()
 time_elapsed = end-start

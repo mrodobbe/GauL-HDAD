@@ -4,7 +4,8 @@ from src.plots import performance_plot
 import numpy as np
 
 
-def test_results_to_logfile(molecules, predictions, deviations, target_property, molecule_file, time_elapsed, save_folder):
+def test_results_to_logfile(molecules, predictions, deviations, target_property,
+                            molecule_file, time_elapsed, save_folder):
     filename = str(save_folder + "/test_results.log")
     f = open(filename, "w")
     license_to_log(f)

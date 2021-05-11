@@ -29,7 +29,8 @@ outputs = np.delete(outputs, bad)
 outputs, heavy_atoms = normalize(molecules, outputs, target_property)
 
 n_folds = 10  # TODO: Make argument
-cv_info = training(molecules, heavy_atoms, representations, outputs, save_folder, target_property, n_folds)
+cv_info = training(molecules, heavy_atoms, representations, outputs, gmm_dictionary,
+                   save_folder, target_property, n_folds)
 
 end = time.time()
 time_elapsed = end-start
