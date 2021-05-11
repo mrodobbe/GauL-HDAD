@@ -31,7 +31,7 @@ def histogram_plot(data, geometry_type):
     num_bins = 200
     plt.hist(values, num_bins, facecolor='blue', alpha=0.5)
     if len(geometry_type) == 2:
-        plt.xlabel("Distance [Ã…]")
+        plt.xlabel("Distance [Å]")
     else:
         plt.xlabel("Angle [rad]")
     plt.ylabel("Occurrence")
