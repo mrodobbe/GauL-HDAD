@@ -3,6 +3,7 @@ import pickle
 from src.geometryFeatures import bonds, angles, dihedrals
 from src.gaussian import gauss
 from src.makeMolecule import add_radical
+from src.conformer import conformer_generation
 
 
 def gaul_representation(mol, conformer_tuple, theta_dict):
@@ -58,31 +59,52 @@ def gaul_representation(mol, conformer_tuple, theta_dict):
     return r
 
 
-def represent(molecules, conformers, gmm_dict, save_folder):
+def represent(molecules, conformers, gmm_dict, save_folder, conformer_distinction=False):
     representations = []
     bad = []
     molecules = list(molecules)
     print("Start representing the molecules!")
-    for mol, conformer_tuple in zip(molecules, conformers):
-        try:
-            v = gaul_representation(mol, conformer_tuple, gmm_dict)
-        except ValueError:
-            print("Bad molecule at index {}".format(molecules.index(mol)))
-            bad.append(molecules.index(mol))
-            continue
-        r = np.asarray(v)
-        representations.append(r)
-    stacked_representations = np.stack(representations)
-    stacked_representations = add_radical(molecules, stacked_representations)
+    if conformer_distinction:
+        all_conformers = []
+        all_molecules = []
+        for mol_name in molecules:
+            confs, n, mol = conformer_generation(mol_name)
+            n_confs = len(confs)
+            print("Found {} conformers for {}.".format(n_confs, mol_name))
+            for conf, i in zip(confs, range(n_confs)):
+                conformer_tuple = (conf, n, mol)
+                v = gaul_representation(mol_name, conformer_tuple, gmm_dict)
+                r = np.asarray(v)
+                representations.append(r)
+                new_mol_name = str(mol_name + "_{}".format(i))
+                all_conformers.append(new_mol_name)
+                all_molecules.append(mol_name)
+        stacked_representations = np.stack(representations)
+        stacked_representations = add_radical(all_molecules, stacked_representations)
+    else:
+        for mol, conformer_tuple in zip(molecules, conformers):
+            try:
+                v = gaul_representation(mol, conformer_tuple, gmm_dict)
+            except ValueError:
+                print("Bad molecule at index {}".format(molecules.index(mol)))
+                bad.append(molecules.index(mol))
+                continue
+            r = np.asarray(v)
+            representations.append(r)
+        stacked_representations = np.stack(representations)
+        stacked_representations = add_radical(molecules, stacked_representations)
     print("Finished representing the molecules")
     with open(str(save_folder + "/representations.pickle"), "wb") as f:
         pickle.dump(representations, f)
     print("Dumped the molecule representations!")
     # text_representation(molecules, stacked_representations, gmm_dict, save_folder)
-    return stacked_representations, bad
+    if conformer_distinction:
+        return stacked_representations, bad, all_molecules, all_conformers
+    else:
+        return stacked_representations, bad
 
 
-def load_representations(molecules, conformers, save_folder):
+def load_representations(molecules, conformers, save_folder, conformer_distinction=False):
     try:
         with open(str(save_folder + "/test_representations.pickle"), "rb") as f:
             representations = pickle.load(f)
@@ -95,9 +117,18 @@ def load_representations(molecules, conformers, save_folder):
             with open(str(save_folder + "/gmm_dictionary.pickle"), "rb") as f:
                 gmm_dictionary = pickle.load(f)
             print("Loaded the GMM data!")
-            representations, bad = represent(molecules, conformers, gmm_dictionary, save_folder)
-            molecules = np.delete(molecules, bad)
-            return representations, molecules
+            if conformer_distinction:
+                representations, bad, all_molecules, all_conformers = represent(molecules, conformers,
+                                                                                gmm_dictionary, save_folder,
+                                                                                conformer_distinction)
+
+                molecules = np.delete(molecules, bad)
+                return representations, all_molecules, all_conformers
+            else:
+                representations, bad = represent(molecules, conformers,
+                                                 gmm_dictionary, save_folder, conformer_distinction)
+                molecules = np.delete(molecules, bad)
+                return representations, molecules, gmm_dictionary
         except FileNotFoundError:
             print("No gmm dictionary found. Please include a gmm dictionary in {}".format(save_folder))
             raise
@@ -121,3 +152,21 @@ def text_representation(molecules, representations, gmm_dict, save_folder):
     all_data = np.vstack((labels, mu, sigma, with_name))
     np.savetxt(str(save_folder + "/fingerprints.txt"), all_data, fmt='%s')
     print("The molecular fingerprints can be evaluated in {}".format(str(save_folder + "/fingerprints.txt")))
+
+
+def represent_conformers(mol_name, gmm_dict):
+    representations = []
+    print("Start representing the molecules!")
+    all_molecules = []
+    confs, n, mol = conformer_generation(mol_name)
+    n_confs = len(confs)
+    print("Found {} conformers for {}.".format(n_confs, mol_name))
+    for conf, i in zip(confs, range(n_confs)):
+        conformer_tuple = (conf, n, mol)
+        v = gaul_representation(mol_name, conformer_tuple, gmm_dict)
+        r = np.asarray(v)
+        representations.append(r)
+        all_molecules.append(mol_name)
+    stacked_representations = np.stack(representations)
+    stacked_representations = add_radical(all_molecules, stacked_representations)
+    return stacked_representations
