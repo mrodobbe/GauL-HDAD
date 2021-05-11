@@ -8,10 +8,11 @@ from sklearn.svm import SVR
 from src.plots import performance_plot
 from joblib import wrap_non_picklable_objects, Parallel, delayed, cpu_count, dump
 from sklearn.model_selection import KFold
+from src.representation import represent_conformers
 
 
 @wrap_non_picklable_objects
-def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
+def run_cv(all_molecules, all_heavy, x, y, loop, i, gmm_dict, save_folder, target):
     train = loop[0]
     test = loop[1]
     all_molecules = np.asarray(all_molecules)
@@ -26,10 +27,13 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
 
     x_test = x[test]
     y_test = y[test]
+    test_dict = {}
+    for test_molecule in test_molecules:
+        test_dict[test_molecule] = represent_conformers(test_molecule, gmm_dict)
 
     n = len(y_train_all)
     n_folds = 9  # TODO: Make argument
-    kf = KFold(n_folds, shuffle=True, random_state=12041997)
+    kf = KFold(n_folds, shuffle=True, random_state=21091995)
 
     rmse_ann = []
     rmse_svr = []
@@ -168,10 +172,51 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
     print('Mean absolute error:\t\t{:.2f} kJ/mol'.format(test_mean_absolute_error))
     print('Root mean squared error:\t{:.2f} kJ/mol'.format(test_root_mean_squared_error))
 
-    if target != "cp":
+    # if target != "cp":
+    #     ensemble = np.array([])
+    #     for model in models:
+    #         test_predicted = model.predict(x_test).reshape(-1)
+    #         test_predicted = np.asarray(test_predicted).astype(np.float)
+    #         if target == "s":
+    #             test_predicted = denormalize(test_predicted, heavy_test, target, coefficient=1.5)
+    #         if len(ensemble) == 0:
+    #             ensemble = test_predicted
+    #         else:
+    #             ensemble = np.vstack((ensemble, test_predicted))
+    #     ensemble_prediction = np.mean(ensemble, axis=0)
+    #     ensemble_sd = np.std(ensemble, axis=0)
+    #     if target == "s":
+    #         y_test_nor = denormalize(y_test, heavy_test, target, coefficient=1.5)
+    #     else:
+    #         y_test_nor = y_test
+    #     ensemble_error = np.abs(ensemble_prediction - y_test_nor)
+    #     ensemble_mae = np.average(ensemble_error)
+    #     ensemble_rmse = np.sqrt(np.average(ensemble_error ** 2))
+    # else:
+    #     ensemble = np.array([])
+    #     for model in models:
+    #         test_predicted = model.predict(x_test)
+    #         test_predicted = np.asarray(test_predicted).astype(np.float)
+    #         prediction_shape = test_predicted.shape
+    #         test_predicted = denormalize(test_predicted, heavy_test, target, coefficient=1.5)
+    #         if len(ensemble) == 0:
+    #             ensemble = test_predicted.flatten()
+    #         else:
+    #             ensemble = np.vstack((ensemble, test_predicted.flatten()))
+    #     ensemble_prediction = np.average(ensemble, axis=0)
+    #     ensemble_prediction = np.reshape(ensemble_prediction, prediction_shape)
+    #     ensemble_sd = np.std(ensemble, axis=0)
+    #     ensemble_sd = np.reshape(ensemble_sd, prediction_shape)
+    #     y_test_nor = denormalize(y_test, heavy_test, target, coefficient=1.5)
+    #     ensemble_error = np.abs(ensemble_prediction - y_test_nor)
+    #     ensemble_mae = np.average(ensemble_error)
+    #     ensemble_rmse = np.sqrt(np.average(ensemble_error ** 2))
+    ensemble_prediction_all = []
+    ensemble_sd_all = []
+    for test_molecule in test_molecules:
         ensemble = np.array([])
         for model in models:
-            test_predicted = model.predict(x_test).reshape(-1)
+            test_predicted = model.predict(test_dict[test_molecule]).reshape(-1)
             test_predicted = np.asarray(test_predicted).astype(np.float)
             if target == "s":
                 test_predicted = denormalize(test_predicted, heavy_test, target, coefficient=1.5)
@@ -179,34 +224,19 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
                 ensemble = test_predicted
             else:
                 ensemble = np.vstack((ensemble, test_predicted))
-        ensemble_prediction = np.mean(ensemble, axis=0)
-        ensemble_sd = np.std(ensemble, axis=0)
-        if target == "s":
-            y_test_nor = denormalize(y_test, heavy_test, target, coefficient=1.5)
-        else:
-            y_test_nor = y_test
-        ensemble_error = np.abs(ensemble_prediction - y_test_nor)
-        ensemble_mae = np.average(ensemble_error)
-        ensemble_rmse = np.sqrt(np.average(ensemble_error ** 2))
-    else:
-        ensemble = np.array([])
-        for model in models:
-            test_predicted = model.predict(x_test)
-            test_predicted = np.asarray(test_predicted).astype(np.float)
-            prediction_shape = test_predicted.shape
-            test_predicted = denormalize(test_predicted, heavy_test, target, coefficient=1.5)
-            if len(ensemble) == 0:
-                ensemble = test_predicted.flatten()
-            else:
-                ensemble = np.vstack((ensemble, test_predicted.flatten()))
-        ensemble_prediction = np.average(ensemble, axis=0)
-        ensemble_prediction = np.reshape(ensemble_prediction, prediction_shape)
-        ensemble_sd = np.std(ensemble, axis=0)
-        ensemble_sd = np.reshape(ensemble_sd, prediction_shape)
+        ensemble_prediction = np.average(ensemble)
+        ensemble_prediction_all.append(ensemble_prediction)
+        ensemble_sd = np.std(ensemble)
+        ensemble_sd_all.append(ensemble_sd)
+    ensemble_prediction_all = np.asarray(ensemble_prediction_all).astype(np.float)
+    ensemble_sd_all = np.asarray(ensemble_sd_all).astype(np.float)
+    if target == "s":
         y_test_nor = denormalize(y_test, heavy_test, target, coefficient=1.5)
-        ensemble_error = np.abs(ensemble_prediction - y_test_nor)
-        ensemble_mae = np.average(ensemble_error)
-        ensemble_rmse = np.sqrt(np.average(ensemble_error ** 2))
+    else:
+        y_test_nor = y_test
+    ensemble_error = np.abs(ensemble_prediction_all - y_test_nor)
+    ensemble_mae = np.average(ensemble_error)
+    ensemble_rmse = np.sqrt(np.average(ensemble_error ** 2))
 
     with open(str(save_folder + "/Fold {}/test_results_fold_{}.txt".format(i, i)), "w") as f:
         f.write('ANN Test performance statistics:\n')
@@ -254,7 +284,7 @@ def run_cv(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
 
     with open(str(save_folder + "/Fold {}/test_ensemble_predictions_{}.txt".format(i, i)), "w") as f:
         f.write(str("Molecule \t Real Value \t Prediction \t Deviation \t Error \n"))
-        for m, v, p, s, e in zip(test_molecules, y_test_nor, ensemble_prediction, ensemble_sd, ensemble_error):
+        for m, v, p, s, e in zip(test_molecules, y_test_nor, ensemble_prediction_all, ensemble_sd_all, ensemble_error):
             if target == "cp":
                 results_list.append([m, round(v[0], 2), round(p[0], 2), round(s[0], 2), round(e[0], 2)])
                 f.write(str(m) + '\t' + str(round(v[0], 4)) + '\t' + str(round(p[0], 4)) + '\t' +
@@ -387,7 +417,7 @@ def run_cv_svr(all_molecules, all_heavy, x, y, loop, i, save_folder, target):
         return ensemble_mae, ensemble_rmse, results_list
 
 
-def training(molecules, heavy_atoms, representations, outputs, save_folder, target_property, n_folds):
+def training(molecules, heavy_atoms, representations, outputs, gmm_dict, save_folder, target_property, n_folds):
     kf = KFold(n_folds, shuffle=True, random_state=12081997)
 
     cpu = cpu_count()
@@ -398,7 +428,7 @@ def training(molecules, heavy_atoms, representations, outputs, save_folder, targ
         n_jobs = n_folds
 
     cv_info = Parallel(n_jobs=n_jobs)(delayed(run_cv)(molecules, heavy_atoms, representations, outputs,
-                                                      loop_kf, i, save_folder, target_property)
+                                                      loop_kf, i, gmm_dict, save_folder, target_property)
                                       for loop_kf, i in zip(kf.split(representations), range(1, n_folds+1)))
 
     # cv_info = Parallel(n_jobs=n_jobs)(delayed(run_cv_svr)(molecules, heavy_atoms, representations, outputs,
