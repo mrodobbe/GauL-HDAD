@@ -38,7 +38,11 @@ for model in models:
 ensemble_prediction = np.mean(ensemble, axis=0)
 ensemble_sd = np.std(ensemble, axis=0)
 
+max_sd = 5
 
+for i, sd in enumerate(ensemble_sd):
+    if sd > max_sd:
+        molecule = molecules[i]
 
 end = time.time()
 time_elapsed = end-start
