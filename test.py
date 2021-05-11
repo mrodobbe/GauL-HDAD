@@ -42,7 +42,7 @@ end = time.time()
 time_elapsed = end-start
 
 test_results_to_logfile(molecules, ensemble_prediction, ensemble_sd,
-                   target_property, molecule_file, time_elapsed, save_folder)
+                        target_property, molecule_file, time_elapsed, save_folder)
 
 # with open(str(save_folder + "/test_predictions.txt"), "w") as f:
 #     f.write(str("Molecule \t Prediction \t Deviation \n"))
