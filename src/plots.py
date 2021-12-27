@@ -177,7 +177,8 @@ def output_plot(molecules, outputs, prop, name="output_plot", folder="newPredict
 def store_histograms(histogram_dict, save_folder):
     for key in histogram_dict:
         v = histogram_dict[key]
-        if len(key) == 2:
+        type_feature = sum(1 for c in key if c.isupper())
+        if type_feature == 2:
             metric = "Distance"
             unit = "Å"
         else:
