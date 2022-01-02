@@ -337,5 +337,5 @@ def license_disclaimer():
           "When using GauL-HDAD for your own publication, please refer to the original paper:\n"
           "Learning Molecular Representations for Thermochemistry Prediction of Cyclic Hydrocarbons and Oxygenates\n"
           "Dobbelaere, M.R.; Plehiers, P.P.; Van de Vijver, R.; Stevens, C.V.; Van Geem, K.M.\n"
-          "Submitted to Journal of Physical Chemistry A, 2021\n"
+          "Journal of Physical Chemistry A, 2021, 125, 23, pp. 5166-5179\n"
           "------------------------------------------------------------------------------------------------------\n\n")
