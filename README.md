@@ -3,8 +3,8 @@ Machine learning method for predicting thermochemical (and many more) properties
 
 This repository contains the GauL HDAD algorithm for representing molecules as a numeric vector and neural networks for molecular property prediction.
 
-The full paper can be found [here](doi.org/10.1021/acs.jpca.1c01956).
-If you have any questions, comments, ideas, improvements, don't hesitate to contact me! Please find contact details [here](lct.ugent.be/people/maarten-dobbelaere).
+The full paper can be found [here](https://doi.org/10.1021/acs.jpca.1c01956).
+If you have any questions, comments, ideas, improvements, don't hesitate to contact me! Please find contact details [here](https://lct.ugent.be/people/maarten-dobbelaere).
 
 
 ## Requirements
