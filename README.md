@@ -3,6 +3,10 @@ Machine learning method for predicting thermochemical (and many more) properties
 
 This repository contains the GauL HDAD algorithm for representing molecules as a numeric vector and neural networks for molecular property prediction.
 
+The full paper can be found [here](doi.org/10.1021/acs.jpca.1c01956).
+If you have any questions, comments, ideas, improvements, don't hesitate to contact me! Please find contact details [here](lct.ugent.be/people/maarten-dobbelaere).
+
+
 ## Requirements
 For small datasets (<1000 molecules), it is possible to train on a standard laptop in less than 30 minutes. It is recommended to use high-performance computing for larger datasets. Please keep in mind that training large datasets (>40000 molecules) will take more than 2 days.
 
@@ -90,4 +94,4 @@ When using GauL-HDAD for your own publication, please cite the original paper:
 
 *Learning Molecular Representations for Thermochemistry Prediction of Cyclic Hydrocarbons and Oxygenates <br>
 Dobbelaere, M.R.; Plehiers, P.P.; Van de Vijver, R.;  Stevens, C.V.; Van Geem, K.M. <br>
-Submitted to Journal of Physical Chemistry A, 2021*
+Journal of Physical Chemistry A, 2021, 125, 23, pp. 5166-5179*
