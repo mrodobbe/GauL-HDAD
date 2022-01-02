@@ -7,7 +7,7 @@ import pickle
 
 
 def run_gmm(key, geometry_dict):
-    print(key)
+    # print(key)
     values = geometry_dict[key]
     gmm_results = gaussian_mixture_model(key, values)
     return gmm_results
@@ -38,7 +38,8 @@ def gaussian_mixture_model(geometry_type, values):
         mu_start = it/num_peaks*max(values)
         sd_start = 0.5
         theta.append([mu_start, sd_start])
-    print(theta)
+    # print(theta)
+    print("{} will be clustered with {} Gaussians.".format(geometry_type, num_peaks))
     theta_v = theta
     tol = 1e-5  # Tolerance value for convergence
     max_iter = 100
@@ -46,7 +47,7 @@ def gaussian_mixture_model(geometry_type, values):
     LL_old = -np.Infinity
     LL = []
     for i in range(max_iter):
-        print("Iteration {}/{}".format(i+1, max_iter))
+        # print("Iteration {}/{}".format(i+1, max_iter))
         matrix = []
         p_m = []
         for value in values:
@@ -70,9 +71,12 @@ def gaussian_mixture_model(geometry_type, values):
         LL_new = np.sum(p_values)
         LL.append(LL_new)
         # print("The old LL is {} and the new LL is {}".format(LL_old, LL_new))
-        print("The log-likelihood is {}".format(LL_new))
+        print("{} iteration {}/{}: The log-likelihood increased with {}%".format(geometry_type,
+                                                                                 i+1,
+                                                                                 max_iter,
+              round(100*np.abs(np.abs(LL_old/LL_new) - 1), 4)))
         if np.abs(np.abs(LL_old/LL_new) - 1) < tol:
-            print("Converged!")
+            print("Clustering of the {} feature has converged!".format(geometry_type))
             break
         else:
             theta_v = []
@@ -97,7 +101,7 @@ def gmm(data, conformers, save_folder):
     f = open(str(save_folder + "/all_peaks.txt"), "w")
     peak_file = open("list_peaks.txt", 'a')
     for key in geometry_dict:
-        print(key)
+        # print(key)
         f.write(str(key + "\n"))
         if key not in listed_peaks:
             peak_file.write(str(key + "\t" + str(2) + "\n"))
